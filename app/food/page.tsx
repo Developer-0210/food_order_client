@@ -1,4 +1,4 @@
-"use client"
+"use client" // must be a Client Component at top
 
 import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
@@ -15,7 +15,7 @@ interface CartLine {
 
 type FoodCategory = string
 
-export default function FoodMenuPage() {
+export default function FoodPage() {
   const searchParams = useSearchParams()
   const tableIdParam = searchParams.get("table_id")
 
@@ -59,7 +59,6 @@ export default function FoodMenuPage() {
   const addToCart = (item: MenuItem) => {
     const selectedType = quantitySelections[item.id] || item.quantity_prices?.[0]?.quantity_type
     const qty = quantities[item.id] || 1
-
     if (!selectedType) return
 
     setCart((prev) => {
@@ -109,7 +108,6 @@ export default function FoodMenuPage() {
           selected_type: l.selected_type,
         })),
       })
-
       setMsg("✅ Order placed! Your food will be prepared shortly.")
       setCart([])
     } catch (e: any) {
@@ -136,15 +134,13 @@ export default function FoodMenuPage() {
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-100">
       <header className="bg-white shadow sticky top-0 z-10">
         <div className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
           <img src="/logo.png" alt="Logo" className="w-13 h-20" />
-          </div>
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-gray-500" />
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="border rounded-md px-2 py-1 text-sm focus:outline-none"
+              className="border rounded-md px-2 py-1 text-sm"
             >
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
@@ -157,7 +153,6 @@ export default function FoodMenuPage() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-6 grid gap-8 lg:grid-cols-3">
-        {/* Left: Menu */}
         <section className="lg:col-span-2 space-y-8">
           {Object.entries(filteredMenu).map(([category, items]) => (
             <div key={category}>
@@ -166,80 +161,73 @@ export default function FoodMenuPage() {
                 <h2 className="text-lg font-semibold capitalize text-gray-800">{category}</h2>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {items.length === 0 ? (
-                  <p className="text-sm text-gray-500 col-span-full">No items in this category.</p>
-                ) : (
-                  items.map((item) => {
-                    const quantityTypes = item.quantity_prices.map((qp) => qp.quantity_type)
-                    const selectedType = quantitySelections[item.id] || quantityTypes[0]
-                    const price = getPriceForType(item, selectedType)
+                {items.map((item) => {
+                  const quantityTypes = item.quantity_prices.map((qp) => qp.quantity_type)
+                  const selectedType = quantitySelections[item.id] || quantityTypes[0]
+                  const price = getPriceForType(item, selectedType)
 
-                    return (
-                      <div
-                        key={item.id}
-                        className="bg-white border rounded-xl p-4 shadow-sm hover:shadow-md flex flex-col justify-between transition"
-                      >
-                        <div className="mb-3">
-                          <h3 className="text-md font-semibold text-gray-900">{item.name}</h3>
-                          <label className="block text-sm mt-1 text-gray-600">
-                            Type:
-                            <select
-                              value={selectedType}
-                              onChange={(e) =>
-                                setQuantitySelections((prev) => ({
-                                  ...prev,
-                                  [item.id]: e.target.value,
-                                }))
-                              }
-                              className="ml-2 border rounded px-1 text-sm"
-                            >
-                              {quantityTypes.map((type) => (
-                                <option key={type} value={type}>
-                                  {type}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold text-blue-600">₹{price.toFixed(2)}</span>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="number"
-                              min={1}
-                              value={quantities[item.id] || 1}
-                              onChange={(e) =>
-                                setQuantities((prev) => ({
-                                  ...prev,
-                                  [item.id]: Math.max(1, Number(e.target.value)),
-                                }))
-                              }
-                              className="w-12 text-center border rounded text-sm"
-                            />
-                            <button
-                              onClick={() => addToCart(item)}
-                              className="p-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
-                            >
-                              <Plus className="h-4 w-4" />
-                            </button>
-                          </div>
+                  return (
+                    <div
+                      key={item.id}
+                      className="bg-white border rounded-xl p-4 shadow-sm flex flex-col justify-between"
+                    >
+                      <div className="mb-3">
+                        <h3 className="text-md font-semibold text-gray-900">{item.name}</h3>
+                        <label className="block text-sm mt-1 text-gray-600">
+                          Type:
+                          <select
+                            value={selectedType}
+                            onChange={(e) =>
+                              setQuantitySelections((prev) => ({
+                                ...prev,
+                                [item.id]: e.target.value,
+                              }))
+                            }
+                            className="ml-2 border rounded px-1 text-sm"
+                          >
+                            {quantityTypes.map((type) => (
+                              <option key={type} value={type}>
+                                {type}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-blue-600">₹{price.toFixed(2)}</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min={1}
+                            value={quantities[item.id] || 1}
+                            onChange={(e) =>
+                              setQuantities((prev) => ({
+                                ...prev,
+                                [item.id]: Math.max(1, Number(e.target.value)),
+                              }))
+                            }
+                            className="w-12 text-center border rounded text-sm"
+                          />
+                          <button
+                            onClick={() => addToCart(item)}
+                            className="p-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </button>
                         </div>
                       </div>
-                    )
-                  })
-                )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           ))}
         </section>
 
-        {/* Right: Cart */}
         <aside className="space-y-4">
           <h2 className="text-lg font-semibold flex items-center">
             <ShoppingCart className="h-5 w-5 mr-1" /> Cart
           </h2>
-
           <div className="bg-white rounded-lg shadow divide-y">
             {cart.length === 0 && (
               <p className="p-4 text-sm text-gray-500">No items added yet.</p>
