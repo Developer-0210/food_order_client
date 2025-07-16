@@ -19,11 +19,11 @@ const TableQR: React.FC<TableQRProps> = ({ tableId, tableNumber }) => {
 
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/qr/${tableId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/qr/${tableId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
       if (!res.ok) {
         throw new Error("Failed to download QR");
