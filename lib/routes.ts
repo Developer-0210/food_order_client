@@ -1,4 +1,4 @@
-const API_BASE = process.env.NXT_PUBLIC_API_BASE_URL |
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL |
 
 export const ROUTES = {
   LOGIN: `${API_BASE}/login`,
