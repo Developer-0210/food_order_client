@@ -1,4 +1,4 @@
-const API_BASE = process.env.NXT_PUBLIC_API_BASE_URL 
+const API_BASE =  https://food-order-api-85i3.onrender.com
 
 export const ROUTES = {
   LOGIN: `${API_BASE}/login`,
