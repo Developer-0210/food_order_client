@@ -3,7 +3,7 @@ import './globals.css'
 import { Toaster } from "react-hot-toast"
 
 export const metadata: Metadata = {
-  title: 'JiffyMenu',
+  title: 'Jiffy-Menu',
   description: 'Order Your Food quickly and easily with JiffyMenu',
   generator: 'Hari Singh Joshi',
   authors: [{ name: 'Hari Singh Joshi', url: 'https://yourwebsite.com' }],
