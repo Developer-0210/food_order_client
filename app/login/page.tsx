@@ -65,8 +65,6 @@ export default function LoginPage() {
       </div>
 
       <div className="w-full max-w-md relative z-10">
-       
-
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
             <CardTitle className="flex items-center gap-3 text-xl">
@@ -185,6 +183,23 @@ export default function LoginPage() {
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <p className="text-xs text-gray-600 font-medium">Secure login with end-to-end encryption</p>
           </div>
+        </div>
+
+        {/* Footer Links */}
+        <div className="mt-6 flex justify-center gap-6 text-xs text-gray-600 font-medium select-none">
+          <Link
+            href="/privacy-policy"
+            className="hover:underline hover:text-blue-600 transition-colors"
+          >
+            Privacy Policy
+          </Link>
+          <span aria-hidden="true" className="text-gray-400">|</span>
+          <Link
+            href="/contact"
+            className="hover:underline hover:text-purple-600 transition-colors"
+          >
+            Contact
+          </Link>
         </div>
       </div>
     </div>
