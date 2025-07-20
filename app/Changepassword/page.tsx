@@ -44,7 +44,7 @@ export default function ChangePasswordPage() {
         email,
         otp,
         password,
-        secret_key: secretKey,
+        secretKey,
       })
 
       toast.success("Password and secret key changed successfully!")
