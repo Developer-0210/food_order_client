@@ -59,14 +59,7 @@ export default function LoginPage() {
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]"></div>
 
-      {/* Back Button */}
-      <button
-        onClick={() => router.back()}
-        className="absolute top-6 left-6 flex items-center gap-2 text-slate-400 hover:text-white transition-colors duration-200"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        <span className="text-sm">Back</span>
-      </button>
+     
 
       <div className="w-full max-w-lg relative z-10">
         <Card className="border border-slate-800 bg-slate-800/50 backdrop-blur-xl shadow-2xl">
