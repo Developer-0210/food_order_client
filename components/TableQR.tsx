@@ -19,14 +19,28 @@ const TableQR: React.FC<TableQRProps> = ({ tableId, tableNumber }) => {
 
     setLoading(true);
     try {
-      // ✅ Replace with your actual backend domain
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/qr/${tableId}?token=${token}`;
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/qr/${tableId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      // ✅ This works in both browser and Android WebView (Applix)
-      window.open(url, "_blank");
+      if (!res.ok) {
+        throw new Error("Failed to download QR");
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `table_${tableNumber}_qr.png`;
+      a.click();
+
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("QR download error:", error);
-      alert("Failed to open QR code.");
+      alert("Failed to download QR. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -42,9 +56,9 @@ const TableQR: React.FC<TableQRProps> = ({ tableId, tableNumber }) => {
           : "bg-blue-600 hover:bg-blue-700 text-white"
       }`}
     >
-      {loading ? "Opening..." : `Download QR for Table ${tableNumber}`}
+      {loading ? "Downloading..." : `Download QR for Table ${tableNumber}`}
     </button>
   );
 };
 
-export default TableQR; 
+export default TableQR;
