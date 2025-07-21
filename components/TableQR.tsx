@@ -10,6 +10,11 @@ interface TableQRProps {
 const TableQR: React.FC<TableQRProps> = ({ tableId, tableNumber }) => {
   const [loading, setLoading] = useState(false);
 
+  const isAndroidWebView = () => {
+    const ua = navigator.userAgent || "";
+    return /wv|android/i.test(ua) && !/chrome/i.test(ua);
+  };
+
   const downloadQR = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -19,29 +24,33 @@ const TableQR: React.FC<TableQRProps> = ({ tableId, tableNumber }) => {
 
     setLoading(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/qr/${tableId}`,
-        {
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/qr/${tableId}`;
+
+      if (isAndroidWebView()) {
+        // ✅ Fallback for Android WebView: Open image in new tab (with token in query)
+        const urlWithToken = `${apiUrl}?token=${token}`;
+        window.open(urlWithToken, "_blank");
+      } else {
+        // ✅ Secure blob download for desktop browser
+        const res = await fetch(apiUrl, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
-      );
+        });
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch QR code");
+        if (!res.ok) throw new Error("Failed to fetch QR");
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `table_${tableNumber}_qr.png`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
       }
-
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `table_${tableNumber}_qr.png`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("QR download error:", error);
       alert("Failed to download QR. Please try again.");
