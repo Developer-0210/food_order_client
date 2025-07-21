@@ -176,7 +176,7 @@ export default function LoginPage() {
 
             <div className="mt-6 text-center">
               <p className="text-xs text-slate-500">
-                By signing in, you agree to our terms of service and privacy policy.
+                By signing in, you agree to our terms of service and <Link href="/privacy">privacy policy</Link> and <Link href="/contact">contact us</Link>.
               </p>
             </div>
           </CardContent>
