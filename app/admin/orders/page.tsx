@@ -5,13 +5,14 @@ import axios from "axios"
 import Layout from "../../../components/Layout"
 import { ROUTES } from "../../../lib/routes"
 import type { Order } from "../../../types"
-import { Clock, CheckCircle, Trash2 } from "lucide-react"
+import { CheckCircle, Trash2 } from "lucide-react"
 import toast from "react-hot-toast"
 
 interface TableRequest {
   id: number
   table_number: number
   created_at: string
+  fixed_message: string
 }
 
 export default function OrderManagement() {
@@ -20,14 +21,15 @@ export default function OrderManagement() {
   const [loading, setLoading] = useState(false)
   const seenOrderIds = useRef<Set<number>>(new Set())
 
-  // Fetch orders and table requests initially
   useEffect(() => {
     fetchOrders()
     fetchTableRequests()
+
     const interval = setInterval(() => {
       fetchOrders()
       fetchTableRequests()
     }, 10000)
+
     return () => clearInterval(interval)
   }, [])
 
@@ -36,7 +38,6 @@ export default function OrderManagement() {
       const response = await axios.get(ROUTES.ORDER.LIST)
       const activeOrders = response.data.filter((order: Order) => order.status !== "served")
       setOrders(activeOrders)
-
       activeOrders.forEach((order: Order) => seenOrderIds.current.add(order.id))
     } catch (err) {
       console.error("Failed to fetch orders:", err)
@@ -61,7 +62,6 @@ export default function OrderManagement() {
     }
   }
 
-  // Poll for new orders
   const [toggledStatuses, setToggledStatuses] = useState<{ [key: number]: boolean }>({})
 
   const toggleLocalStatus = (orderId: number) => {
@@ -154,7 +154,7 @@ export default function OrderManagement() {
                 >
                   <div>
                     <p className="text-lg font-bold text-yellow-800">Table {req.table_number}</p>
-                    <p className="text-sm text-yellow-700">🛎️ Call for waiter</p>
+                    <p className="text-sm text-yellow-700">🛎️ {req.fixed_message || "Call for waiter"}</p>
                     <p className="text-xs text-gray-500 mt-1">{new Date(req.created_at).toLocaleTimeString()}</p>
                   </div>
                   <button
