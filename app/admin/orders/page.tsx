@@ -8,15 +8,26 @@ import type { Order } from "../../../types"
 import { Clock, CheckCircle, Trash2 } from "lucide-react"
 import toast from "react-hot-toast"
 
+interface TableRequest {
+  id: number
+  table_number: number
+  created_at: string
+}
+
 export default function OrderManagement() {
   const [orders, setOrders] = useState<Order[]>([])
+  const [requests, setRequests] = useState<TableRequest[]>([])
   const [loading, setLoading] = useState(false)
   const seenOrderIds = useRef<Set<number>>(new Set())
 
-  // Fetch orders initially
+  // Fetch orders and table requests initially
   useEffect(() => {
     fetchOrders()
-    const interval = setInterval(fetchOrders, 10000)
+    fetchTableRequests()
+    const interval = setInterval(() => {
+      fetchOrders()
+      fetchTableRequests()
+    }, 10000)
     return () => clearInterval(interval)
   }, [])
 
@@ -29,6 +40,24 @@ export default function OrderManagement() {
       activeOrders.forEach((order: Order) => seenOrderIds.current.add(order.id))
     } catch (err) {
       console.error("Failed to fetch orders:", err)
+    }
+  }
+
+  const fetchTableRequests = async () => {
+    try {
+      const response = await axios.get(ROUTES.ORDER.TABLE_REQUEST)
+      setRequests(response.data.requests)
+    } catch (err) {
+      console.error("Failed to fetch table requests:", err)
+    }
+  }
+
+  const deleteRequest = async (requestId: number) => {
+    try {
+      await axios.delete(ROUTES.ORDER.TABLE_REQUEST_DELETE(requestId))
+      fetchTableRequests()
+    } catch (err) {
+      console.error("Failed to delete request:", err)
     }
   }
 
@@ -67,7 +96,6 @@ export default function OrderManagement() {
                 boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
               },
             })
-            
 
             fetchOrders()
           }
@@ -81,7 +109,7 @@ export default function OrderManagement() {
   }, [])
 
   const updateOrderStatus = async (orderId: number, status: string) => {
-    setLoading(true) 
+    setLoading(true)
     try {
       await axios.patch(ROUTES.ORDER.UPDATE_STATUS(orderId, status))
       if (status === "served") {
@@ -114,6 +142,34 @@ export default function OrderManagement() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <h1 className="text-2xl font-semibold text-gray-800 mb-6">Order Management</h1>
 
+        {/* Table Requests */}
+        {requests.length > 0 && (
+          <div className="mb-10">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">Table Requests</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {requests.map((req) => (
+                <div
+                  key={req.id}
+                  className="bg-yellow-50 border border-yellow-200 shadow-md rounded-xl p-4 flex justify-between items-center"
+                >
+                  <div>
+                    <p className="text-lg font-bold text-yellow-800">Table {req.table_number}</p>
+                    <p className="text-sm text-yellow-700">🛎️ Call for waiter</p>
+                    <p className="text-xs text-gray-500 mt-1">{new Date(req.created_at).toLocaleTimeString()}</p>
+                  </div>
+                  <button
+                    onClick={() => deleteRequest(req.id)}
+                    className="text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md"
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Orders */}
         {orders.length === 0 ? (
           <div className="text-center py-20 text-gray-400 text-lg">No active orders</div>
         ) : (
@@ -128,29 +184,27 @@ export default function OrderManagement() {
                     <h2 className="text-lg font-semibold text-gray-900">Order #{order.id}</h2>
                     <div
                       onClick={() => toggleLocalStatus(order.id)}
-                         className="flex flex-col items-center justify-center cursor-pointer select-none space-y-1">
-                            {/* Switch UI */}
-                            <span
-                              className={`relative inline-block w-10 h-5 transition rounded-full ${
-                                toggledStatuses[order.id] ? "bg-green-400" : "bg-red-400"
-                              }`}>
-                            <span
-                              className={`absolute left-0 top-0 w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-300 ${
-                                toggledStatuses[order.id] ? "translate-x-5" : "translate-x-0"
-                              }`}
-                            ></span>
-                          </span>
-
-                            {/* Text below switch */}
-                            <span
-                              className={`text-sm font-semibold ${
-                                toggledStatuses[order.id] ? "text-green-600" : "text-red-600"
-                              }`}
-                            >
-                              {toggledStatuses[order.id] ? "Delivered" : "Pending"}
-                            </span>
-                          </div>
-
+                      className="flex flex-col items-center justify-center cursor-pointer select-none space-y-1"
+                    >
+                      <span
+                        className={`relative inline-block w-10 h-5 transition rounded-full ${
+                          toggledStatuses[order.id] ? "bg-green-400" : "bg-red-400"
+                        }`}
+                      >
+                        <span
+                          className={`absolute left-0 top-0 w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-300 ${
+                            toggledStatuses[order.id] ? "translate-x-5" : "translate-x-0"
+                          }`}
+                        ></span>
+                      </span>
+                      <span
+                        className={`text-sm font-semibold ${
+                          toggledStatuses[order.id] ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {toggledStatuses[order.id] ? "Delivered" : "Pending"}
+                      </span>
+                    </div>
                   </div>
                   <p className="mt-1 text-sm text-gray-500">
                     Table {order.table_number} • {new Date(order.created_at).toLocaleTimeString()}
@@ -174,8 +228,6 @@ export default function OrderManagement() {
                     <span>Total</span>
                     <span>₹{order.total_amount.toFixed(2)}</span>
                   </div>
-
-                
                 </div>
 
                 <div className="px-6 py-4 bg-gray-50 space-y-2">
@@ -188,9 +240,7 @@ export default function OrderManagement() {
                       <CheckCircle className="h-4 w-4 inline mr-1" />
                       Mark as Done
                     </button>
-                    
                   )}
-                
 
                   {order.status === "ready" && (
                     <button
