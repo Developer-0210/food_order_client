@@ -26,14 +26,17 @@ export const ROUTES = {
     DELETE: (id: number) => `${API_BASE}/tables/${id}`,
      
   },
-  ORDER: {
+ORDER: {
     CREATE: `${API_BASE}/orders`,
     LIST: `${API_BASE}/orders`,
    UPDATE_STATUS: (id: number, status: string) =>
   `${API_BASE}/orders/${id}/status?status=${status.trim()}`,
-    DELETE: (id: number) => `${API_BASE}/orders/${id}`, // ✅ Add this line
+    DELETE: (id: number) => `${API_BASE}/orders/${id}`, 
     POLL_NEW: `${API_BASE}/orders/poll-new-orders`,
     LIST_History: `${API_BASE}/orders/history`,
+    TABLE_REQUEST:`${API_BASE}/orders/table_request`,
+    TABLE_REQUEST_DELETE: (id: number) => `${API_BASE}/orders/table_request/remove/${id}`,
+
   },
   OTP: {
     CREATE: `${API_BASE}/otp/request-otp`,
