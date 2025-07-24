@@ -49,10 +49,10 @@ export default function OrderManagement() {
     try {
       await axios.delete(ROUTES.ORDER.TABLE_REQUEST_DELETE(requestId))
       setRequests((prev) => prev.filter((req) => req.id !== requestId))
-      toast.success("Call request deleted")
+      toast.success("Call request Accepted")
     } catch (err) {
       console.error("Failed to delete request:", err)
-      toast.error("Failed to delete call request")
+      toast.error("Failed to Accept call request")
     }
   }
 
@@ -171,7 +171,7 @@ export default function OrderManagement() {
                     onClick={() => deleteRequest(req.id)}
                     className="text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md"
                   >
-                    Delete
+                    Accept
                   </button>
                 </div>
               ))}
