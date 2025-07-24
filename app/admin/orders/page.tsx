@@ -21,7 +21,6 @@ export default function OrderManagement() {
   const [loading, setLoading] = useState(false)
   const seenOrderIds = useRef<Set<number>>(new Set())
 
-  // Fetch orders from API
   const fetchOrders = async () => {
     try {
       const response = await axios.get(ROUTES.ORDER.LIST)
@@ -31,27 +30,24 @@ export default function OrderManagement() {
       activeOrders.forEach((order: Order) => seenOrderIds.current.add(order.id))
     } catch (err) {
       console.error("Failed to fetch orders:", err)
+      toast.error("Failed to fetch orders")
     }
   }
 
-  // Fetch table call requests from API
   const fetchTableRequests = async () => {
     try {
       const response = await axios.get(ROUTES.ORDER.TABLE_REQUEST)
-      // Defensive fallback if response.data.requests missing: some APIs return array directly
-      // so try both
       const reqs: TableRequest[] = response.data.requests ?? response.data ?? []
       setRequests(reqs)
     } catch (err) {
       console.error("Failed to fetch table requests:", err)
+      toast.error("Failed to fetch table requests")
     }
   }
 
-  // Delete a table call request by ID
   const deleteRequest = async (requestId: number) => {
     try {
       await axios.delete(ROUTES.ORDER.TABLE_REQUEST_DELETE(requestId))
-      // Update state by filtering out deleted request without refetch
       setRequests((prev) => prev.filter((req) => req.id !== requestId))
       toast.success("Call request deleted")
     } catch (err) {
@@ -72,7 +68,6 @@ export default function OrderManagement() {
     return () => clearInterval(interval)
   }, [])
 
-  // Poll for new orders every 10 seconds, show toast notification
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
@@ -128,6 +123,7 @@ export default function OrderManagement() {
       } else {
         fetchOrders()
       }
+      toast.success(`Order #${orderId} marked as ${status}`)
     } catch (err) {
       console.error("Failed to update order status:", err)
       toast.error("Failed to update order status")
@@ -156,129 +152,133 @@ export default function OrderManagement() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <h1 className="text-2xl font-semibold text-gray-800 mb-6">Order Management</h1>
 
-        {/* Orders */}
+        {/* Table Requests Section */}
+        {requests && requests.length > 0 && (
+          <div className="mb-10">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">Table Requests</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {requests.map((req) => (
+                <div
+                  key={req.id}
+                  className="bg-yellow-50 border border-yellow-200 shadow-md rounded-xl p-4 flex justify-between items-center"
+                >
+                  <div>
+                    <p className="text-lg font-bold text-yellow-800">Table {req.table_number}</p>
+                    <p className="text-sm text-yellow-700">🛎️ {req.fixed_message || "Call for waiter"}</p>
+                    <p className="text-xs text-gray-500 mt-1">{new Date(req.created_at).toLocaleTimeString()}</p>
+                  </div>
+                  <button
+                    onClick={() => deleteRequest(req.id)}
+                    className="text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md"
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Orders Section */}
         {(!orders || orders.length === 0) ? (
           <div className="text-center py-20 text-gray-400 text-lg">No active orders</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {orders.map((order) => {
-              // Find any call request for this order's table
-              const callRequest = requests.find((req) => req.table_number === order.table_number)
-
-              return (
-                <div
-                  key={order.id}
-                  className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col"
-                >
-                  <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <div className="flex justify-between items-center">
-                      <h2 className="text-lg font-semibold text-gray-900">Order #{order.id}</h2>
-                      <div
-                        onClick={() => toggleLocalStatus(order.id)}
-                        className="flex flex-col items-center justify-center cursor-pointer select-none space-y-1"
-                      >
-                        <span
-                          className={`relative inline-block w-10 h-5 transition rounded-full ${
-                            toggledStatuses[order.id] ? "bg-green-400" : "bg-red-400"
-                          }`}
-                        >
-                          <span
-                            className={`absolute left-0 top-0 w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-300 ${
-                              toggledStatuses[order.id] ? "translate-x-5" : "translate-x-0"
-                            }`}
-                          ></span>
-                        </span>
-                        <span
-                          className={`text-sm font-semibold ${
-                            toggledStatuses[order.id] ? "text-green-600" : "text-red-600"
-                          }`}
-                        >
-                          {toggledStatuses[order.id] ? "Delivered" : "Pending"}
-                        </span>
-                      </div>
-                    </div>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Table {order.table_number} • {new Date(order.created_at).toLocaleTimeString()}
-                    </p>
-
-                    {/* Show call for waiter request if exists */}
-                    {callRequest && (
-                      <div className="mt-3 p-3 bg-yellow-50 border border-yellow-300 rounded-lg flex justify-between items-center">
-                        <p className="text-yellow-800 font-semibold">
-                          🛎️ {callRequest.fixed_message || "Call for waiter"}
-                        </p>
-                        <button
-                          onClick={() => deleteRequest(callRequest.id)}
-                          className="text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md"
-                          aria-label={`Delete call request for table ${callRequest.table_number}`}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="px-6 py-4 flex-1">
-                    <div className="space-y-2 text-sm text-gray-700">
-                      {(order.items && order.items.length !== 0)
-                        ? order.items.map((item, index) => (
-                            <div key={index} className="flex justify-between">
-                              <span>
-                                {item.quantity}× {item.menu_item.name}
-                                <span className="text-gray-400"> ({item.selected_type})</span>
-                              </span>
-                              <span className="font-medium">
-                                ₹{(item.price_at_order * item.quantity).toFixed(2)}
-                              </span>
-                            </div>
-                          ))
-                        : "No items"}
-                    </div>
-
-                    <div className="mt-4 pt-4 border-t border-gray-200 text-sm flex justify-between font-semibold">
-                      <span>Total</span>
-                      <span>₹{order.total_amount.toFixed(2)}</span>
-                    </div>
-                  </div>
-
-                  <div className="px-6 py-4 bg-gray-50 space-y-2">
-                    {order.status === "pending" && (
-                      <button
-                        onClick={() => updateOrderStatus(order.id, "served")}
-                        disabled={loading}
-                        className="w-full px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md disabled:opacity-50 transition"
-                      >
-                        <CheckCircle className="h-4 w-4 inline mr-1" />
-                        Mark as Done
-                      </button>
-                    )}
-
-                    {order.status === "ready" && (
-                      <button
-                        onClick={() => updateOrderStatus(order.id, "served")}
-                        disabled={loading}
-                        className="w-full px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-md disabled:opacity-50 transition"
-                      >
-                        Mark as Served
-                      </button>
-                    )}
-
-                    {order.status === "served" && (
-                      <div className="text-center text-sm text-gray-500">Order completed</div>
-                    )}
-
-                    <button
-                      onClick={() => deleteOrder(order.id)}
-                      disabled={loading}
-                      className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md disabled:opacity-50 flex items-center justify-center transition"
+            {orders.map((order) => (
+              <div
+                key={order.id}
+                className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col"
+              >
+                <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-lg font-semibold text-gray-900">Order #{order.id}</h2>
+                    <div
+                      onClick={() => toggleLocalStatus(order.id)}
+                      className="flex flex-col items-center justify-center cursor-pointer select-none space-y-1"
                     >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete Order
-                    </button>
+                      <span
+                        className={`relative inline-block w-10 h-5 transition rounded-full ${
+                          toggledStatuses[order.id] ? "bg-green-400" : "bg-red-400"
+                        }`}
+                      >
+                        <span
+                          className={`absolute left-0 top-0 w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-300 ${
+                            toggledStatuses[order.id] ? "translate-x-5" : "translate-x-0"
+                          }`}
+                        ></span>
+                      </span>
+                      <span
+                        className={`text-sm font-semibold ${
+                          toggledStatuses[order.id] ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {toggledStatuses[order.id] ? "Delivered" : "Pending"}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Table {order.table_number} • {new Date(order.created_at).toLocaleTimeString()}
+                  </p>
+                </div>
+
+                <div className="px-6 py-4 flex-1">
+                  <div className="space-y-2 text-sm text-gray-700">
+                    {(order.items && order.items.length !== 0)
+                      ? order.items.map((item, index) => (
+                          <div key={index} className="flex justify-between">
+                            <span>
+                              {item.quantity}× {item.menu_item.name}
+                              <span className="text-gray-400"> ({item.selected_type})</span>
+                            </span>
+                            <span className="font-medium">₹{(item.price_at_order * item.quantity).toFixed(2)}</span>
+                          </div>
+                        ))
+                      : "No items"}
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-gray-200 text-sm flex justify-between font-semibold">
+                    <span>Total</span>
+                    <span>₹{order.total_amount.toFixed(2)}</span>
                   </div>
                 </div>
-              )
-            })}
+
+                <div className="px-6 py-4 bg-gray-50 space-y-2">
+                  {order.status === "pending" && (
+                    <button
+                      onClick={() => updateOrderStatus(order.id, "served")}
+                      disabled={loading}
+                      className="w-full px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md disabled:opacity-50 transition"
+                    >
+                      <CheckCircle className="h-4 w-4 inline mr-1" />
+                      Mark as Done
+                    </button>
+                  )}
+
+                  {order.status === "ready" && (
+                    <button
+                      onClick={() => updateOrderStatus(order.id, "served")}
+                      disabled={loading}
+                      className="w-full px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-md disabled:opacity-50 transition"
+                    >
+                      Mark as Served
+                    </button>
+                  )}
+
+                  {order.status === "served" && (
+                    <div className="text-center text-sm text-gray-500">Order completed</div>
+                  )}
+
+                  <button
+                    onClick={() => deleteOrder(order.id)}
+                    disabled={loading}
+                    className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md disabled:opacity-50 flex items-center justify-center transition"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Order
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
