@@ -1,9 +1,5 @@
-# *
 User-agent: *
 Allow: /
-
-# Host
-Host: https://www.jiffymenu.com
 
 # Sitemaps
 Sitemap: https://www.jiffymenu.com/sitemap.xml
