@@ -5,53 +5,60 @@ export interface User {
   name: string
   is_superuser: number
   restaurant_id?: number
-  role:string
-  email:string
+  role: string
+  email: string
 }
+
+const TOKEN_KEY = "token"
+const USER_KEY = "user"
 
 export const auth = {
   setToken: (token: string) => {
-    localStorage.setItem("token", token)
+    localStorage.setItem(TOKEN_KEY, token)
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
   },
 
-  getToken: () => {
+  getToken: (): string | null => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("token")
+      return localStorage.getItem(TOKEN_KEY)
     }
     return null
   },
 
   removeToken: () => {
-    localStorage.removeItem("token")
+    localStorage.removeItem(TOKEN_KEY)
     delete axios.defaults.headers.common["Authorization"]
   },
 
-  isAuthenticated: () => {
+  isAuthenticated: (): boolean => {
     return !!auth.getToken()
   },
 
   getCurrentUser: (): User | null => {
     if (typeof window !== "undefined") {
-      const userStr = localStorage.getItem("user")
+      const userStr = localStorage.getItem(USER_KEY)
       return userStr ? JSON.parse(userStr) : null
     }
     return null
   },
 
   setCurrentUser: (user: User) => {
-    localStorage.setItem("user", JSON.stringify(user))
+    localStorage.setItem(USER_KEY, JSON.stringify(user))
+  },
+
+  removeCurrentUser: () => {
+    localStorage.removeItem(USER_KEY)
   },
 
   logout: () => {
     auth.removeToken()
-    localStorage.removeItem("user")
+    auth.removeCurrentUser()
   },
 }
 
-// Set up axios interceptor to include token
+// Ensure token is set on initial load (e.g., after refresh)
 if (typeof window !== "undefined") {
-  const token = auth.getToken()
+  const token = localStorage.getItem(TOKEN_KEY)
   if (token) {
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
   }
