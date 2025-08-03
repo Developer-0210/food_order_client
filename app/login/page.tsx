@@ -1,17 +1,30 @@
 "use client"
 
-import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import axios from "axios"
-import { LogIn, Eye, EyeOff, Mail, Lock, Sparkles, User } from 'lucide-react'
 import Link from "next/link"
-import { auth } from "../../lib/auth"
+import {
+  LogIn,
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  Sparkles,
+  User,
+} from "lucide-react"
+
 import { ROUTES } from "../../lib/routes"
+import { auth } from "../../lib/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
 export default function LoginPage() {
   const [username, setUsername] = useState("")
@@ -46,7 +59,7 @@ export default function LoginPage() {
         router.push("/admin/profile")
       }
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Login failed")
+      setError(err.response?.data?.detail || "Login failed. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -54,9 +67,11 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background overlays */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]" />
 
+      {/* Login Card */}
       <div className="w-full max-w-lg relative z-10">
         <Card className="border border-slate-800 bg-slate-800/50 backdrop-blur-xl shadow-2xl">
           <CardHeader className="text-center pb-6 pt-8">
@@ -68,15 +83,16 @@ export default function LoginPage() {
                 <Sparkles className="h-4 w-4 text-white" />
               </div>
             </div>
-            <CardTitle className="text-3xl font-bold text-white mb-2">Welcome Back</CardTitle>
+            <CardTitle className="text-3xl font-bold text-white mb-2">
+              Welcome Back
+            </CardTitle>
             <p className="text-slate-400 text-base leading-relaxed">
-              Sign in to your restaurant account
-              <br />
-              to access your dashboard and manage your business.
+              Sign in to your restaurant dashboard and manage your business.
             </p>
           </CardHeader>
 
           <CardContent className="px-8 pb-8">
+            {/* Error message */}
             {error && (
               <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
                 <p className="text-red-400 text-sm font-medium">{error}</p>
@@ -84,6 +100,7 @@ export default function LoginPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Username */}
               <div className="space-y-3">
                 <Label htmlFor="username" className="text-sm font-semibold text-slate-300">
                   Email Address
@@ -92,8 +109,8 @@ export default function LoginPage() {
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
                   <Input
                     id="username"
-                    type="text"
-                    placeholder="your.email@example.com"
+                    type="email"
+                    placeholder="you@example.com"
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
@@ -103,6 +120,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
+              {/* Password */}
               <div className="space-y-3">
                 <Label htmlFor="password" className="text-sm font-semibold text-slate-300">
                   Password
@@ -130,6 +148,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
+              {/* Submit Button */}
               <Button
                 type="submit"
                 disabled={loading || !username || !password}
@@ -149,37 +168,44 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <div className="mt-8 pt-6 border-t border-slate-700">
-              <div className="space-y-4 text-center">
-                <p className="text-slate-400 text-sm">
-                  Don't have an account?{" "}
-                  <Link
-                    href="/register"
-                    className="text-blue-400 hover:text-blue-300 font-medium transition-colors duration-200 hover:underline underline-offset-4"
-                  >
-                    Sign up here
-                  </Link>
-                </p>
+            {/* Footer links */}
+            <div className="mt-8 pt-6 border-t border-slate-700 text-center space-y-4">
+              <p className="text-slate-400 text-sm">
+                Don&apos;t have an account?{" "}
                 <Link
-                  href="/forgot"
-                  className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium text-sm transition-colors duration-200 hover:underline underline-offset-4"
+                  href="/register"
+                  className="text-blue-400 hover:text-blue-300 font-medium transition duration-200 hover:underline underline-offset-4"
                 >
-                  <Lock className="h-4 w-4" />
-                  Forgot your password?
+                  Sign up here
                 </Link>
-              </div>
+              </p>
+              <Link
+                href="/forgot"
+                className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium text-sm transition duration-200 hover:underline underline-offset-4"
+              >
+                <Lock className="h-4 w-4" />
+                Forgot your password?
+              </Link>
             </div>
 
-            <div className="mt-6 text-center">
-              <p className="text-xs text-slate-500">
-                By signing in, you agree to our terms of service and <Link href="/privacy-policy" className="text-green-600">privacy policy</Link> and <Link href="/contact" className="text-green-600">contact us</Link>.
-              </p>
+            {/* Terms */}
+            <div className="mt-6 text-center text-xs text-slate-500">
+              By signing in, you agree to our{" "}
+              <Link href="/privacy-policy" className="text-green-500 hover:underline">
+                privacy policy
+              </Link>{" "}
+              and{" "}
+              <Link href="/contact" className="text-green-500 hover:underline">
+                contact us
+              </Link>
+              .
             </div>
           </CardContent>
         </Card>
 
+        {/* Security notice */}
         <div className="mt-6 flex items-center justify-center gap-2 text-slate-500 text-xs">
-          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
           <span>Secure login with end-to-end encryption</span>
         </div>
       </div>
