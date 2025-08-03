@@ -4,7 +4,7 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import axios from "axios"
-import { LogIn, Eye, EyeOff, Mail, Lock, ArrowLeft, User, Sparkles } from 'lucide-react'
+import { LogIn, Eye, EyeOff, Mail, Lock, Sparkles, User } from 'lucide-react'
 import Link from "next/link"
 import { auth } from "../../lib/auth"
 import { ROUTES } from "../../lib/routes"
@@ -32,14 +32,13 @@ export default function LoginPage() {
       formData.append("password", password)
 
       const response = await axios.post(ROUTES.LOGIN, formData, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
       })
 
       const { access_token, user } = response.data
-      auth.setToken(access_token)
-      auth.setCurrentUser(user)
+
+      await auth.setToken(access_token)
+      await auth.setCurrentUser(user)
 
       if (user.is_superuser) {
         router.push("/superuser/register-admin")
@@ -55,11 +54,8 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]"></div>
-
-     
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]" />
 
       <div className="w-full max-w-lg relative z-10">
         <Card className="border border-slate-800 bg-slate-800/50 backdrop-blur-xl shadow-2xl">
@@ -182,7 +178,6 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        {/* Security Badge */}
         <div className="mt-6 flex items-center justify-center gap-2 text-slate-500 text-xs">
           <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
           <span>Secure login with end-to-end encryption</span>
