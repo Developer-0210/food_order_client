@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Toaster } from "react-hot-toast"
+import TokenRestore from "../components/TokenRestore" // 👈 import it
 
 export const metadata: Metadata = {
   title: 'JiffyMenu - Quick Food Ordering',
@@ -70,6 +71,7 @@ export default function RootLayout({
         <link rel="icon" href="/icon.png" />
       </head>
       <body>
+        <TokenRestore /> {/* 👈 Add this here */}
         <Toaster position="top-left" toastOptions={{ duration: 10000 }} />
         {children}
       </body>
