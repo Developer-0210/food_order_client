@@ -21,6 +21,33 @@ export default function OrderManagement() {
   const [loading, setLoading] = useState(false)
   const seenOrderIds = useRef<Set<number>>(new Set())
 
+  // Function to play notification sound
+  const playNotificationSound = () => {
+    try {
+      const audio = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.wav")
+      audio.volume = 0.7 // Set volume to 70%
+      audio.play().catch((error) => {
+        console.log("Primary audio failed, trying fallback:", error)
+        // Fallback sound
+        const fallbackAudio = new Audio(
+          "https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-one/zapsplat_multimedia_notification_bell_ping_001_44712.mp3",
+        )
+        fallbackAudio.volume = 0.7
+        fallbackAudio.play().catch((err) => {
+          console.log("Fallback audio also failed:", err)
+          // Second fallback - simple beep sound
+          const beepAudio = new Audio(
+            "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/Eeyw",
+          )
+          beepAudio.volume = 0.5
+          beepAudio.play().catch(() => console.log("All audio playback failed"))
+        })
+      })
+    } catch (error) {
+      console.log("Audio initialization failed:", error)
+    }
+  }
+
   const fetchOrders = async () => {
     try {
       const response = await axios.get(ROUTES.ORDER.LIST)
@@ -59,12 +86,10 @@ export default function OrderManagement() {
   useEffect(() => {
     fetchOrders()
     fetchTableRequests()
-
     const interval = setInterval(() => {
       fetchOrders()
       fetchTableRequests()
     }, 10000)
-
     return () => clearInterval(interval)
   }, [])
 
@@ -73,10 +98,12 @@ export default function OrderManagement() {
       try {
         const res = await axios.get(ROUTES.ORDER.POLL_NEW)
         const newOrders = res.data.orders || []
-
         for (const order of newOrders) {
           if (!seenOrderIds.current.has(order.id)) {
             seenOrderIds.current.add(order.id)
+
+            // Play sound when new order arrives
+            playNotificationSound()
 
             toast.success(`🆕 New Order #${order.id} • Table ${order.table_number}`, {
               duration: 10000,
@@ -93,7 +120,6 @@ export default function OrderManagement() {
                 boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
               },
             })
-
             fetchOrders()
           }
         }
@@ -101,7 +127,6 @@ export default function OrderManagement() {
         console.error("Polling error:", err)
       }
     }, 10000)
-
     return () => clearInterval(interval)
   }, [])
 
@@ -180,7 +205,7 @@ export default function OrderManagement() {
         )}
 
         {/* Orders Section */}
-        {(!orders || orders.length === 0) ? (
+        {!orders || orders.length === 0 ? (
           <div className="text-center py-20 text-gray-400 text-lg">No active orders</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -223,7 +248,7 @@ export default function OrderManagement() {
 
                 <div className="px-6 py-4 flex-1">
                   <div className="space-y-2 text-sm text-gray-700">
-                    {(order.items && order.items.length !== 0)
+                    {order.items && order.items.length !== 0
                       ? order.items.map((item, index) => (
                           <div key={index} className="flex justify-between">
                             <span>
@@ -235,7 +260,6 @@ export default function OrderManagement() {
                         ))
                       : "No items"}
                   </div>
-
                   <div className="mt-4 pt-4 border-t border-gray-200 text-sm flex justify-between font-semibold">
                     <span>Total</span>
                     <span>₹{order.total_amount.toFixed(2)}</span>
@@ -253,7 +277,6 @@ export default function OrderManagement() {
                       Mark as Done
                     </button>
                   )}
-
                   {order.status === "ready" && (
                     <button
                       onClick={() => updateOrderStatus(order.id, "served")}
@@ -263,11 +286,9 @@ export default function OrderManagement() {
                       Mark as Served
                     </button>
                   )}
-
                   {order.status === "served" && (
                     <div className="text-center text-sm text-gray-500">Order completed</div>
                   )}
-
                   <button
                     onClick={() => deleteOrder(order.id)}
                     disabled={loading}
