@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area" // Import ScrollBar for horizontal scroll indicator
 
 export default function RegisterAdmin() {
   const [admins, setAdmins] = useState<Admin[]>([])
@@ -123,23 +123,26 @@ export default function RegisterAdmin() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-fuchsia-50 to-purple-100">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
-              <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-extrabold bg-gradient-to-r from-purple-700 to-pink-500 bg-clip-text text-transparent">
                 JIFFYMENU
               </h1>
-              <Badge variant="default" className="ml-4 px-3 py-1 text-xs font-medium bg-blue-600 text-white">
+              <Badge
+                variant="default"
+                className="ml-4 px-4 py-1 text-sm font-medium bg-purple-600 text-white rounded-full shadow-sm"
+              >
                 Super Admin
               </Badge>
             </div>
             <Button
-              variant="secondary"
+              variant="ghost"
               onClick={handleLogout}
-              className="flex items-center text-sm text-gray-700 hover:text-gray-900"
+              className="flex items-center text-sm text-gray-700 hover:text-purple-700 transition-colors duration-200"
             >
               <LogOut className="h-4 w-4 mr-2" />
               Logout
@@ -153,29 +156,36 @@ export default function RegisterAdmin() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Form Section */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-8 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-purple-600 to-indigo-500 text-white py-4 rounded-t-xl">
-                <CardTitle className="text-lg font-medium">{editingId ? "Update Admin" : "Create New Admin"}</CardTitle>
+            <Card className="sticky top-8 shadow-xl border-none rounded-2xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-purple-700 to-pink-500 text-white py-5 rounded-t-2xl">
+                <CardTitle className="text-xl font-semibold">
+                  {editingId ? "Update Admin" : "Create New Admin"}
+                </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent className="p-6 bg-white">
                 {error && (
-                  <Alert variant="destructive" className="mb-4">
+                  <Alert variant="destructive" className="mb-4 rounded-lg">
                     <X className="h-4 w-4" />
                     <AlertTitle>Error</AlertTitle>
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
                 {success && (
-                  <Alert variant="default" className="mb-4 bg-green-100 text-green-800 border-green-300">
+                  <Alert
+                    variant="default"
+                    className="mb-4 bg-emerald-100 text-emerald-800 border-emerald-300 rounded-lg"
+                  >
                     <Check className="h-4 w-4" />
                     <AlertTitle>Success</AlertTitle>
                     <AlertDescription>{success}</AlertDescription>
                   </Alert>
                 )}
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="name">Name</Label>
+                      <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+                        Name
+                      </Label>
                       <Input
                         id="name"
                         type="text"
@@ -183,10 +193,13 @@ export default function RegisterAdmin() {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="John Doe"
+                        className="mt-1 focus:border-purple-500 focus:ring-purple-500 rounded-lg"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                        Email
+                      </Label>
                       <Input
                         id="email"
                         type="email"
@@ -194,10 +207,13 @@ export default function RegisterAdmin() {
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         placeholder="admin@example.com"
+                        className="mt-1 focus:border-purple-500 focus:ring-purple-500 rounded-lg"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="password">Password</Label>
+                      <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                        Password
+                      </Label>
                       <Input
                         id="password"
                         type="password"
@@ -205,10 +221,13 @@ export default function RegisterAdmin() {
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         placeholder="••••••••"
+                        className="mt-1 focus:border-purple-500 focus:ring-purple-500 rounded-lg"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="contact">Contact</Label>
+                      <Label htmlFor="contact" className="text-sm font-medium text-gray-700">
+                        Contact
+                      </Label>
                       <Input
                         id="contact"
                         type="text"
@@ -216,10 +235,13 @@ export default function RegisterAdmin() {
                         value={formData.contact}
                         onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
                         placeholder="+1234567890"
+                        className="mt-1 focus:border-purple-500 focus:ring-purple-500 rounded-lg"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="restaurant_name">Restaurant Name</Label>
+                      <Label htmlFor="restaurant_name" className="text-sm font-medium text-gray-700">
+                        Restaurant Name
+                      </Label>
                       <Input
                         id="restaurant_name"
                         type="text"
@@ -227,10 +249,13 @@ export default function RegisterAdmin() {
                         value={formData.restaurant_name}
                         onChange={(e) => setFormData({ ...formData, restaurant_name: e.target.value })}
                         placeholder="My Restaurant"
+                        className="mt-1 focus:border-purple-500 focus:ring-purple-500 rounded-lg"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="secret_key">Secret Key</Label>
+                      <Label htmlFor="secret_key" className="text-sm font-medium text-gray-700">
+                        Secret Key
+                      </Label>
                       <Input
                         id="secret_key"
                         type="password"
@@ -238,6 +263,7 @@ export default function RegisterAdmin() {
                         value={formData.secret_key}
                         onChange={(e) => setFormData({ ...formData, secret_key: e.target.value })}
                         placeholder="••••••••"
+                        className="mt-1 focus:border-purple-500 focus:ring-purple-500 rounded-lg"
                       />
                     </div>
                   </div>
@@ -245,7 +271,7 @@ export default function RegisterAdmin() {
                     <Button
                       type="submit"
                       disabled={loading}
-                      className={`flex-1 shadow-lg ${editingId ? "bg-purple-500 hover:bg-purple-600" : "bg-indigo-600 hover:bg-indigo-700"}`}
+                      className={`flex-1 py-2.5 rounded-lg font-semibold text-white shadow-md transition-all duration-300 ${editingId ? "bg-amber-500 hover:bg-amber-600" : "bg-purple-600 hover:bg-purple-700"}`}
                     >
                       {loading ? (
                         <Loader2 className="h-5 w-5 animate-spin mr-2" />
@@ -263,7 +289,12 @@ export default function RegisterAdmin() {
                           : "Create Admin"}
                     </Button>
                     {editingId && (
-                      <Button type="button" variant="outline" onClick={resetForm}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={resetForm}
+                        className="py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200 bg-transparent"
+                      >
                         Cancel
                       </Button>
                     )}
@@ -275,44 +306,44 @@ export default function RegisterAdmin() {
 
           {/* Admins List Section */}
           <div className="lg:col-span-2">
-            <Card className="shadow-lg min-h-[50vh] lg:h-[calc(100vh-180px)] flex flex-col">
-              <CardHeader className="bg-gradient-to-r from-purple-600 to-indigo-500 text-white py-4 rounded-t-xl">
-                <CardTitle className="text-lg font-medium">Existing Admins</CardTitle>
+            <Card className="shadow-xl border-none rounded-2xl min-h-[50vh] lg:h-[calc(100vh-180px)] flex flex-col">
+              <CardHeader className="bg-gradient-to-r from-purple-700 to-pink-500 text-white py-5 rounded-t-2xl">
+                <CardTitle className="text-xl font-semibold">Existing Admins</CardTitle>
               </CardHeader>
               <CardContent className="p-0 flex-1 overflow-hidden">
                 {admins.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <div className="text-xl font-semibold mb-2">No admins found</div>
-                    <p className="text-sm">Create your first admin using the form</p>
+                  <div className="text-center py-12 text-gray-500">
+                    <div className="text-2xl font-bold mb-2">No admins found</div>
+                    <p className="text-base">Start by creating your first admin using the form on the left!</p>
                   </div>
                 ) : (
                   <ScrollArea className="h-full w-full">
-                    <div className="overflow-x-auto">
+                    <div className="min-w-full inline-block align-middle">
                       {" "}
-                      {/* This div enables horizontal scrolling */}
+                      {/* Ensures table takes minimum full width and allows overflow */}
                       <Table>
                         <TableHeader className="sticky top-0 bg-gray-50 z-10">
                           <TableRow>
-                            <TableHead className="px-6 py-3 text-left text-xs font-medium text-indigo-600 uppercase tracking-wider">
+                            <TableHead className="px-6 py-3 text-left text-xs font-bold text-purple-700 uppercase tracking-wider">
                               Name
                             </TableHead>
-                            <TableHead className="px-6 py-3 text-left text-xs font-medium text-indigo-600 uppercase tracking-wider">
+                            <TableHead className="px-6 py-3 text-left text-xs font-bold text-purple-700 uppercase tracking-wider">
                               Email
                             </TableHead>
-                            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <TableHead className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                               Restaurant
                             </TableHead>
-                            <TableHead className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <TableHead className="px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">
                               Actions
                             </TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody className="bg-white divide-y divide-gray-200">
                           {admins.map((admin) => (
-                            <TableRow key={admin.id} className="hover:bg-gray-50 transition">
+                            <TableRow key={admin.id} className="hover:bg-purple-50 transition-colors duration-150">
                               <TableCell className="px-6 py-4 whitespace-nowrap">
                                 <div className="flex items-center">
-                                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-lg">
+                                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold text-lg shadow-sm">
                                     {admin.name.charAt(0).toUpperCase()}
                                   </div>
                                   <div className="ml-4">
@@ -334,18 +365,18 @@ export default function RegisterAdmin() {
                                     size="icon"
                                     onClick={() => handleEdit(admin)}
                                     title="Edit"
-                                    className="hover:bg-blue-50"
+                                    className="text-blue-600 hover:bg-blue-100 hover:text-blue-800 transition-colors duration-200"
                                   >
-                                    <Edit className="h-5 w-5 text-blue-600" />
+                                    <Edit className="h-5 w-5" />
                                   </Button>
                                   <Button
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => handleDelete(admin.id)}
                                     title="Delete"
-                                    className="hover:bg-red-50"
+                                    className="text-red-600 hover:bg-red-100 hover:text-red-800 transition-colors duration-200"
                                   >
-                                    <Trash2 className="h-5 w-5 text-red-600" />
+                                    <Trash2 className="h-5 w-5" />
                                   </Button>
                                 </div>
                               </TableCell>
@@ -354,6 +385,7 @@ export default function RegisterAdmin() {
                         </TableBody>
                       </Table>
                     </div>
+                    <ScrollBar orientation="horizontal" /> {/* Add horizontal scrollbar */}
                   </ScrollArea>
                 )}
               </CardContent>
