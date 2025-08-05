@@ -34,6 +34,15 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const router = useRouter()
 
+
+  useEffect(() => {
+  const token = localStorage.getItem("token")
+  if (token) {
+    // You can also check if it's expired here if needed
+    router.replace("/admin/profile") // or your appropriate redirect page
+  }
+}, [])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
