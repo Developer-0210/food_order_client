@@ -10,8 +10,15 @@ export default function HomePage() {
 
   useLayoutEffect(() => {
     const token = localStorage.getItem("token")
-    if (token) {
-      router.replace("/admin/profile") // or wherever your logged-in page is
+    const userStr = localStorage.getItem("user")
+    const user = userStr ? JSON.parse(userStr) : null
+
+    if (token && user) {
+      if (user.is_superuser) {
+        router.push("/superuser/register-admin")
+      } else {
+        router.push("/admin/profile")
+      }
     } else {
       setIsChecking(false)
     }
