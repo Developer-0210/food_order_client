@@ -122,7 +122,7 @@ export default function FoodMenuPage() {
         })),
       })
 
-      setMsg("✅ Order placed! Your food will be prepared shortly.")
+      setMsg("✅ Order placed! Your food will be prepared shortly and billing will be at counter")
       setCart([])
     } catch (e: any) {
       console.error("Order placement error:", e.response)
