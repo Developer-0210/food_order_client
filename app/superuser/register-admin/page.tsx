@@ -4,7 +4,9 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import { ROUTES } from "../../../lib/routes"
 import type { Admin } from "../../../types"
-import { Plus, Trash2, Edit, X, Check } from "lucide-react"
+import { Plus, Trash2, Edit, X, Check, LogOut } from "lucide-react"
+import { auth } from "../../../lib/auth"
+import { useRouter } from "next/navigation"
 
 export default function RegisterAdmin() {
   const [admins, setAdmins] = useState<Admin[]>([])
@@ -20,10 +22,16 @@ export default function RegisterAdmin() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const router = useRouter()
 
   useEffect(() => {
+    const currentUser = auth.getCurrentUser()
+    if (!currentUser) {
+      router.push("/login")
+      return
+    }
     fetchAdmins()
-  }, [])
+  }, [router])
 
   const fetchAdmins = async () => {
     try {
@@ -98,26 +106,42 @@ export default function RegisterAdmin() {
     setSuccess("")
   }
 
+  const handleLogout = () => {
+    auth.logout()
+    router.push("/login")
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <div className="flex items-center">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
-              JIFFYMENU
-            </h1>
-            <span className="ml-4 px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-              Super Admin
-            </span>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100">
+      {/* Header */}
+      <div className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
+                JIFFYMENU
+              </h1>
+              <span className="ml-4 px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                Super Admin
+              </span>
+            </div>
+            <button 
+              onClick={handleLogout}
+              className="flex items-center text-sm text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md hover:bg-gray-100"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </button>
           </div>
         </div>
+      </div>
 
-        {/* Main Content */}
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Form Section */}
+          {/* Form Section - Fixed */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden sticky top-8">
               <div className="bg-gradient-to-r from-indigo-600 to-blue-500 px-6 py-4">
                 <h3 className="text-lg font-medium text-white">
                   {editingId ? "Update Admin" : "Create New Admin"}
@@ -243,13 +267,13 @@ export default function RegisterAdmin() {
             </div>
           </div>
 
-          {/* Admins List Section */}
+          {/* Admins List Section - Scrollable */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden h-[calc(100vh-180px)]">
               <div className="bg-gradient-to-r from-indigo-600 to-blue-500 px-6 py-4">
                 <h3 className="text-lg font-medium text-white">Existing Admins</h3>
               </div>
-              <div className="p-4">
+              <div className="p-4 h-full overflow-y-auto">
                 {admins.length === 0 ? (
                   <div className="text-center py-8">
                     <div className="text-gray-400 mb-2">No admins found</div>
@@ -258,7 +282,7 @@ export default function RegisterAdmin() {
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
+                      <thead className="bg-gray-50 sticky top-0">
                         <tr>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
