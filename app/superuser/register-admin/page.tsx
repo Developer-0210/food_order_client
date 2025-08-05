@@ -123,21 +123,21 @@ export default function RegisterAdmin() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100">
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
-              <h1 className="text-2xl font-extrabold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
                 JIFFYMENU
               </h1>
-              <Badge variant="secondary" className="ml-4 px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800">
+              <Badge variant="default" className="ml-4 px-3 py-1 text-xs font-medium bg-blue-600 text-white">
                 Super Admin
               </Badge>
             </div>
             <Button
-              variant="ghost"
+              variant="secondary"
               onClick={handleLogout}
               className="flex items-center text-sm text-gray-700 hover:text-gray-900"
             >
@@ -154,7 +154,7 @@ export default function RegisterAdmin() {
           {/* Form Section */}
           <div className="lg:col-span-1">
             <Card className="sticky top-8 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white py-4 rounded-t-xl">
+              <CardHeader className="bg-gradient-to-r from-purple-600 to-indigo-500 text-white py-4 rounded-t-xl">
                 <CardTitle className="text-lg font-medium">{editingId ? "Update Admin" : "Create New Admin"}</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
@@ -166,7 +166,7 @@ export default function RegisterAdmin() {
                   </Alert>
                 )}
                 {success && (
-                  <Alert className="mb-4 bg-green-50 text-green-700 border-green-200">
+                  <Alert variant="default" className="mb-4 bg-green-100 text-green-800 border-green-300">
                     <Check className="h-4 w-4" />
                     <AlertTitle>Success</AlertTitle>
                     <AlertDescription>{success}</AlertDescription>
@@ -245,7 +245,7 @@ export default function RegisterAdmin() {
                     <Button
                       type="submit"
                       disabled={loading}
-                      className={`flex-1 ${editingId ? "bg-yellow-500 hover:bg-yellow-600" : "bg-blue-600 hover:bg-blue-700"}`}
+                      className={`flex-1 shadow-lg ${editingId ? "bg-purple-500 hover:bg-purple-600" : "bg-indigo-600 hover:bg-indigo-700"}`}
                     >
                       {loading ? (
                         <Loader2 className="h-5 w-5 animate-spin mr-2" />
@@ -275,74 +275,85 @@ export default function RegisterAdmin() {
 
           {/* Admins List Section */}
           <div className="lg:col-span-2">
-            <Card className="shadow-lg h-[calc(100vh-180px)] flex flex-col">
-              <CardHeader className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white py-4 rounded-t-xl">
+            <Card className="shadow-lg min-h-[50vh] lg:h-[calc(100vh-180px)] flex flex-col">
+              <CardHeader className="bg-gradient-to-r from-purple-600 to-indigo-500 text-white py-4 rounded-t-xl">
                 <CardTitle className="text-lg font-medium">Existing Admins</CardTitle>
               </CardHeader>
               <CardContent className="p-0 flex-1 overflow-hidden">
                 {admins.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
-                    <div className="text-lg mb-2">No admins found</div>
+                    <div className="text-xl font-semibold mb-2">No admins found</div>
                     <p className="text-sm">Create your first admin using the form</p>
                   </div>
                 ) : (
                   <ScrollArea className="h-full w-full">
-                    <Table>
-                      <TableHeader className="sticky top-0 bg-gray-50 z-10">
-                        <TableRow>
-                          <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Name
-                          </TableHead>
-                          <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Email
-                          </TableHead>
-                          <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Restaurant
-                          </TableHead>
-                          <TableHead className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody className="bg-white divide-y divide-gray-200">
-                        {admins.map((admin) => (
-                          <TableRow key={admin.id} className="hover:bg-gray-50 transition">
-                            <TableCell className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium text-lg">
-                                  {admin.name.charAt(0).toUpperCase()}
-                                </div>
-                                <div className="ml-4">
-                                  <div className="text-sm font-medium text-gray-900">{admin.name}</div>
-                                  <div className="text-sm text-gray-500">{admin.contact}</div>
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">{admin.email}</div>
-                            </TableCell>
-                            <TableCell className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">{admin.restaurant_name}</div>
-                            </TableCell>
-                            <TableCell className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                              <div className="flex justify-end space-x-2">
-                                <Button variant="ghost" size="icon" onClick={() => handleEdit(admin)} title="Edit">
-                                  <Edit className="h-5 w-5 text-blue-600" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDelete(admin.id)}
-                                  title="Delete"
-                                >
-                                  <Trash2 className="h-5 w-5 text-red-600" />
-                                </Button>
-                              </div>
-                            </TableCell>
+                    <div className="overflow-x-auto">
+                      {" "}
+                      {/* This div enables horizontal scrolling */}
+                      <Table>
+                        <TableHeader className="sticky top-0 bg-gray-50 z-10">
+                          <TableRow>
+                            <TableHead className="px-6 py-3 text-left text-xs font-medium text-indigo-600 uppercase tracking-wider">
+                              Name
+                            </TableHead>
+                            <TableHead className="px-6 py-3 text-left text-xs font-medium text-indigo-600 uppercase tracking-wider">
+                              Email
+                            </TableHead>
+                            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Restaurant
+                            </TableHead>
+                            <TableHead className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Actions
+                            </TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody className="bg-white divide-y divide-gray-200">
+                          {admins.map((admin) => (
+                            <TableRow key={admin.id} className="hover:bg-gray-50 transition">
+                              <TableCell className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center">
+                                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-lg">
+                                    {admin.name.charAt(0).toUpperCase()}
+                                  </div>
+                                  <div className="ml-4">
+                                    <div className="text-sm font-medium text-gray-900">{admin.name}</div>
+                                    <div className="text-sm text-gray-500">{admin.contact}</div>
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900">{admin.email}</div>
+                              </TableCell>
+                              <TableCell className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900">{admin.restaurant_name}</div>
+                              </TableCell>
+                              <TableCell className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div className="flex justify-end space-x-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleEdit(admin)}
+                                    title="Edit"
+                                    className="hover:bg-blue-50"
+                                  >
+                                    <Edit className="h-5 w-5 text-blue-600" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleDelete(admin.id)}
+                                    title="Delete"
+                                    className="hover:bg-red-50"
+                                  >
+                                    <Trash2 className="h-5 w-5 text-red-600" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </ScrollArea>
                 )}
               </CardContent>
