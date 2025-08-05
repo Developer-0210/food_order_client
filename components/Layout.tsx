@@ -72,8 +72,8 @@ export default function Layout({ children, title }: LayoutProps) {
           </div>
           <div className="h-0 flex-1 overflow-y-auto pt-5 pb-4">
             <div className="flex items-center space-x-2 px-4 mb-6">
-              <img src="/logo.png" alt="Logo" className="w-12 h-12" />
-              <span className="text-xl font-bold text-purple-700">Dashboard</span>
+             
+              <span className="text-xl font-bold text-purple-700">JiffyMenu</span>
             </div>
             <nav className="space-y-1 px-2">
               {navigation.map((item) => (
