@@ -88,6 +88,18 @@ export default function TableManagement() {
             <h3 className="text-lg font-medium text-gray-900">
               {editingTable ? "Edit Table" : "Add New Table"}
             </h3>
+            <p className="text-sm text-gray-600">
+  Kindly download QR from&nbsp;
+  <a
+    href="https://www.jiffymenu.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-blue-600 hover:underline font-medium"
+  >
+    www.jiffymenu.com
+  </a>
+</p>
+
           </div>
           <div className="p-6">
             {error && (
