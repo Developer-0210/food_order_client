@@ -1,12 +1,23 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { ROUTES } from "../../../lib/routes"
 import type { Admin } from "../../../types"
-import { Plus, Trash2, Edit, X, Check, LogOut } from "lucide-react"
+import { Plus, Trash2, Edit, X, Check, LogOut, Loader2 } from "lucide-react"
 import { auth } from "../../../lib/auth"
 import { useRouter } from "next/navigation"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 export default function RegisterAdmin() {
   const [admins, setAdmins] = useState<Admin[]>([])
@@ -97,10 +108,10 @@ export default function RegisterAdmin() {
     setFormData({
       name: admin.name,
       email: admin.email,
-      password: "",
+      password: "", // Password should not be pre-filled for security
       contact: admin.contact,
       restaurant_name: admin.restaurant_name || "",
-      secret_key: "",
+      secret_key: "", // Secret key should not be pre-filled for security
     })
     setError("")
     setSuccess("")
@@ -112,135 +123,134 @@ export default function RegisterAdmin() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
-      <div className="bg-white shadow-sm">
+      <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-extrabold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
                 JIFFYMENU
               </h1>
-              <span className="ml-4 px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              <Badge variant="secondary" className="ml-4 px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800">
                 Super Admin
-              </span>
+              </Badge>
             </div>
-            <button 
+            <Button
+              variant="ghost"
               onClick={handleLogout}
-              className="flex items-center text-sm text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md hover:bg-gray-100"
+              className="flex items-center text-sm text-gray-700 hover:text-gray-900"
             >
               <LogOut className="h-4 w-4 mr-2" />
               Logout
-            </button>
+            </Button>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Form Section - Fixed */}
+          {/* Form Section */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden sticky top-8">
-              <div className="bg-gradient-to-r from-indigo-600 to-blue-500 px-6 py-4">
-                <h3 className="text-lg font-medium text-white">
-                  {editingId ? "Update Admin" : "Create New Admin"}
-                </h3>
-              </div>
-              <div className="p-6">
+            <Card className="sticky top-8 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white py-4 rounded-t-xl">
+                <CardTitle className="text-lg font-medium">{editingId ? "Update Admin" : "Create New Admin"}</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
                 {error && (
-                  <div className="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
-                    <div className="flex items-center">
-                      <X className="h-5 w-5 mr-2" />
-                      <span>{error}</span>
-                    </div>
-                  </div>
+                  <Alert variant="destructive" className="mb-4">
+                    <X className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
                 )}
                 {success && (
-                  <div className="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded">
-                    <div className="flex items-center">
-                      <Check className="h-5 w-5 mr-2" />
-                      <span>{success}</span>
-                    </div>
-                  </div>
+                  <Alert className="mb-4 bg-green-50 text-green-700 border-green-200">
+                    <Check className="h-4 w-4" />
+                    <AlertTitle>Success</AlertTitle>
+                    <AlertDescription>{success}</AlertDescription>
+                  </Alert>
                 )}
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                      <input
+                      <Label htmlFor="name">Name</Label>
+                      <Input
+                        id="name"
                         type="text"
                         required
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                         placeholder="John Doe"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                      <input
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
                         type="email"
                         required
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                         placeholder="admin@example.com"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                      <input
+                      <Label htmlFor="password">Password</Label>
+                      <Input
+                        id="password"
                         type="password"
                         required
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                         placeholder="••••••••"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Contact</label>
-                      <input
+                      <Label htmlFor="contact">Contact</Label>
+                      <Input
+                        id="contact"
                         type="text"
                         required
                         value={formData.contact}
                         onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                         placeholder="+1234567890"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Restaurant Name</label>
-                      <input
+                      <Label htmlFor="restaurant_name">Restaurant Name</Label>
+                      <Input
+                        id="restaurant_name"
                         type="text"
                         required
                         value={formData.restaurant_name}
                         onChange={(e) => setFormData({ ...formData, restaurant_name: e.target.value })}
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                         placeholder="My Restaurant"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Secret Key</label>
-                      <input
-                        type="text"
+                      <Label htmlFor="secret_key">Secret Key</Label>
+                      <Input
+                        id="secret_key"
+                        type="password"
                         required
                         value={formData.secret_key}
                         onChange={(e) => setFormData({ ...formData, secret_key: e.target.value })}
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                         placeholder="••••••••"
                       />
                     </div>
                   </div>
                   <div className="flex items-center gap-3 pt-2">
-                    <button
+                    <Button
                       type="submit"
                       disabled={loading}
-                      className={`flex-1 flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white ${editingId ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-blue-600 hover:bg-blue-700'} transition shadow-md disabled:opacity-50`}
+                      className={`flex-1 ${editingId ? "bg-yellow-500 hover:bg-yellow-600" : "bg-blue-600 hover:bg-blue-700"}`}
                     >
                       {loading ? (
-                        <span className="inline-block h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                      ) : editingId ? (
+                        <Edit className="h-5 w-5 mr-2" />
                       ) : (
                         <Plus className="h-5 w-5 mr-2" />
                       )}
@@ -249,96 +259,97 @@ export default function RegisterAdmin() {
                           ? "Updating..."
                           : "Creating..."
                         : editingId
-                        ? "Update Admin"
-                        : "Create Admin"}
-                    </button>
+                          ? "Update Admin"
+                          : "Create Admin"}
+                    </Button>
                     {editingId && (
-                      <button
-                        type="button"
-                        onClick={resetForm}
-                        className="px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-100 transition"
-                      >
+                      <Button type="button" variant="outline" onClick={resetForm}>
                         Cancel
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </form>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Admins List Section - Scrollable */}
+          {/* Admins List Section */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden h-[calc(100vh-180px)]">
-              <div className="bg-gradient-to-r from-indigo-600 to-blue-500 px-6 py-4">
-                <h3 className="text-lg font-medium text-white">Existing Admins</h3>
-              </div>
-              <div className="p-4 h-full overflow-y-auto">
+            <Card className="shadow-lg h-[calc(100vh-180px)] flex flex-col">
+              <CardHeader className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white py-4 rounded-t-xl">
+                <CardTitle className="text-lg font-medium">Existing Admins</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 flex-1 overflow-hidden">
                 {admins.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="text-gray-400 mb-2">No admins found</div>
-                    <p className="text-sm text-gray-500">Create your first admin using the form</p>
+                  <div className="text-center py-8 text-gray-500">
+                    <div className="text-lg mb-2">No admins found</div>
+                    <p className="text-sm">Create your first admin using the form</p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50 sticky top-0">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                  <ScrollArea className="h-full w-full">
+                    <Table>
+                      <TableHeader className="sticky top-0 bg-gray-50 z-10">
+                        <TableRow>
+                          <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Name
+                          </TableHead>
+                          <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Email
+                          </TableHead>
+                          <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Restaurant
+                          </TableHead>
+                          <TableHead className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody className="bg-white divide-y divide-gray-200">
                         {admins.map((admin) => (
-                          <tr key={admin.id} className="hover:bg-gray-50 transition">
-                            <td className="px-6 py-4 whitespace-nowrap">
+                          <TableRow key={admin.id} className="hover:bg-gray-50 transition">
+                            <TableCell className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
-                                <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium">
-                                  {admin.name.charAt(0)}
+                                <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium text-lg">
+                                  {admin.name.charAt(0).toUpperCase()}
                                 </div>
                                 <div className="ml-4">
                                   <div className="text-sm font-medium text-gray-900">{admin.name}</div>
                                   <div className="text-sm text-gray-500">{admin.contact}</div>
                                 </div>
                               </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            </TableCell>
+                            <TableCell className="px-6 py-4 whitespace-nowrap">
                               <div className="text-sm text-gray-900">{admin.email}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            </TableCell>
+                            <TableCell className="px-6 py-4 whitespace-nowrap">
                               <div className="text-sm text-gray-900">{admin.restaurant_name}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            </TableCell>
+                            <TableCell className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                               <div className="flex justify-end space-x-2">
-                                <button
-                                  onClick={() => handleEdit(admin)}
-                                  className="text-blue-600 hover:text-blue-900 p-2 rounded-full hover:bg-blue-50 transition"
-                                  title="Edit"
-                                >
-                                  <Edit className="h-5 w-5" />
-                                </button>
-                                <button
+                                <Button variant="ghost" size="icon" onClick={() => handleEdit(admin)} title="Edit">
+                                  <Edit className="h-5 w-5 text-blue-600" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
                                   onClick={() => handleDelete(admin.id)}
-                                  className="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-50 transition"
                                   title="Delete"
                                 >
-                                  <Trash2 className="h-5 w-5" />
-                                </button>
+                                  <Trash2 className="h-5 w-5 text-red-600" />
+                                </Button>
                               </div>
-                            </td>
-                          </tr>
+                            </TableCell>
+                          </TableRow>
                         ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      </TableBody>
+                    </Table>
+                  </ScrollArea>
                 )}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
