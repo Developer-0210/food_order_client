@@ -73,7 +73,7 @@ export default function Layout({ children, title }: LayoutProps) {
           <div className="h-0 flex-1 overflow-y-auto pt-5 pb-4">
             <div className="flex items-center space-x-2 px-4 mb-6">
              
-              <span className="text-xl font-bold text-purple-700">JiffyMenu</span>
+              <span className="text-xl font-bold text-red-700">JiffyMenu</span>
             </div>
             <nav className="space-y-1 px-2">
               {navigation.map((item) => (
@@ -96,7 +96,7 @@ export default function Layout({ children, title }: LayoutProps) {
         <div className="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
           <div className="flex items-center px-4 space-x-2 mb-6">
             
-            <span className="text-2xl font-semibold text-purple-700">JiffyMenu</span>
+            <span className="text-2xl font-bold text-red-700">JiffyMenu</span>
           </div>
           <nav className="flex-1 px-2 space-y-1">
             {navigation.map((item) => (
