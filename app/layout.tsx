@@ -76,12 +76,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <TokenRestore />
-        {/* Toaster is global and client-ready */}
-        <Toaster position="top-left" />
-        {children}
-      </body>
+      <body> <TokenRestore /> {/* 👈 Add this here */} <Toaster position="top-left" toastOptions={{ duration: 3000 }} /> {children} </body>
     </html>
   )
 }
