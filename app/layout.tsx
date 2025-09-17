@@ -75,9 +75,12 @@ export default function RootLayout({
         <Toaster
   position="top-left"
   toastOptions={{
-    duration: Infinity, // never auto close
+    duration: Infinity,
+    style: { cursor: "pointer" },
+    role: "button",
   }}
 />
+
 
         {children}
       </body>
