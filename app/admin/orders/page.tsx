@@ -5,7 +5,7 @@ import axios from "axios"
 import Layout from "../../../components/Layout"
 import { ROUTES } from "../../../lib/routes"
 import type { Order } from "../../../types"
-import { CheckCircle, Trash2 } from "lucide-react"
+import { CheckCircle, Trash2, X } from "lucide-react"
 import toast from "react-hot-toast"
 
 interface TableRequest {
@@ -25,26 +25,22 @@ export default function OrderManagement() {
   const playNotificationSound = () => {
     try {
       const audio = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.wav")
-      audio.volume = 0.7 // Set volume to 70%
-      audio.play().catch((error) => {
-        console.log("Primary audio failed, trying fallback:", error)
-        // Fallback sound
+      audio.volume = 0.7
+      audio.play().catch(() => {
         const fallbackAudio = new Audio(
-          "https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-one/zapsplat_multimedia_notification_bell_ping_001_44712.mp3",
+          "https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-one/zapsplat_multimedia_notification_bell_ping_001_44712.mp3"
         )
         fallbackAudio.volume = 0.7
-        fallbackAudio.play().catch((err) => {
-          console.log("Fallback audio also failed:", err)
-          // Second fallback - simple beep sound
+        fallbackAudio.play().catch(() => {
           const beepAudio = new Audio(
-            "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/Eeyw",
+            "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/Eeyw"
           )
           beepAudio.volume = 0.5
           beepAudio.play().catch(() => console.log("All audio playback failed"))
         })
       })
     } catch (error) {
-      console.log("Audio initialization failed:", error)
+      console.log("Audio init failed:", error)
     }
   }
 
@@ -55,8 +51,7 @@ export default function OrderManagement() {
       const activeOrders = dataOrders.filter((order: Order) => order.status !== "served")
       setOrders(activeOrders)
       activeOrders.forEach((order: Order) => seenOrderIds.current.add(order.id))
-    } catch (err) {
-      console.error("Failed to fetch orders:", err)
+    } catch {
       toast.error("Failed to fetch orders")
     }
   }
@@ -66,8 +61,7 @@ export default function OrderManagement() {
       const response = await axios.get(ROUTES.ORDER.TABLE_REQUEST)
       const reqs: TableRequest[] = response.data.requests ?? response.data ?? []
       setRequests(reqs)
-    } catch (err) {
-      console.error("Failed to fetch table requests:", err)
+    } catch {
       toast.error("Failed to fetch table requests")
     }
   }
@@ -77,8 +71,7 @@ export default function OrderManagement() {
       await axios.delete(ROUTES.ORDER.TABLE_REQUEST_DELETE(requestId))
       setRequests((prev) => prev.filter((req) => req.id !== requestId))
       toast.success("Call request Accepted")
-    } catch (err) {
-      console.error("Failed to delete request:", err)
+    } catch {
       toast.error("Failed to Accept call request")
     }
   }
@@ -105,21 +98,33 @@ export default function OrderManagement() {
             // Play sound when new order arrives
             playNotificationSound()
 
-            toast.success(`🆕 New Order #${order.id} • Table ${order.table_number}`, {
-              duration: 10000,
-              position: "top-left",
-              icon: "🍽️",
-              style: {
-                fontSize: "1.1rem",
-                fontWeight: "600",
-                padding: "16px 24px",
-                border: "1px solid #22c55e",
-                backgroundColor: "#f0fdf4",
-                color: "#14532d",
-                borderRadius: "12px",
-                boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
-              },
-            })
+            // Toast with manual ❌ close button
+            toast.custom(
+              (t) => (
+                <div
+                  className={`flex items-center justify-between gap-3 border border-green-500 bg-green-50 text-green-900 rounded-xl shadow-lg px-4 py-3 w-full max-w-sm ${
+                    t.visible ? "animate-enter" : "animate-leave"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span role="img" aria-label="plate">
+                      🍽️
+                    </span>
+                    <span className="font-semibold">
+                      🆕 New Order #{order.id} • Table {order.table_number}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ),
+              { duration: Infinity, position: "top-left" }
+            )
+
             fetchOrders()
           }
         }
@@ -149,8 +154,7 @@ export default function OrderManagement() {
         fetchOrders()
       }
       toast.success(`Order #${orderId} marked as ${status}`)
-    } catch (err) {
-      console.error("Failed to update order status:", err)
+    } catch {
       toast.error("Failed to update order status")
     } finally {
       setLoading(false)
@@ -164,8 +168,7 @@ export default function OrderManagement() {
       await axios.delete(ROUTES.ORDER.DELETE(orderId))
       fetchOrders()
       toast.success(`Order #${orderId} deleted`)
-    } catch (err) {
-      console.error("Failed to delete order:", err)
+    } catch {
       toast.error("Failed to delete order")
     } finally {
       setLoading(false)
@@ -305,4 +308,4 @@ export default function OrderManagement() {
       </div>
     </Layout>
   )
-} 
+}
