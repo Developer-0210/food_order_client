@@ -6,7 +6,7 @@ import Layout from "../../../components/Layout"
 import { ROUTES } from "../../../lib/routes"
 import type { Order } from "../../../types"
 import { CheckCircle, Trash2 } from "lucide-react"
-import { showToast } from "../../layout"   // 👈 import global helper
+import { showToast } from "../../../lib/toast"
 
 interface TableRequest {
   id: number
