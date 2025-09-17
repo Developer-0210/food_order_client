@@ -72,7 +72,7 @@ export default function RootLayout({
       </head>
       <body>
         <TokenRestore /> {/* 👈 Add this here */}
-        <Toaster position="top-left" toastOptions={{ duration: 10000 }} />
+        <Toaster position="top-left" toastOptions={{ duration: 1000 }} />
         {children}
       </body>
     </html>
