@@ -5,20 +5,26 @@ import axios from "axios"
 import toast, { Toast } from "react-hot-toast"
 import { ROUTES } from "../lib/routes"
 import { X } from "lucide-react"
-import { useSession } from "next-auth/react"  // 👈 if using next-auth
+
+// 🔑 Replace this with however your TokenRestore saves session info
+function getToken() {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("token") // or sessionStorage
+  }
+  return null
+}
 
 export default function OrderNotifier() {
-  const { data: session, status } = useSession()
   const seenOrderIds = useRef<Set<number>>(new Set())
 
   useEffect(() => {
-    // 👇 only run if logged in and role is admin
-    if (status !== "authenticated" || session?.user?.role !== "admin") return
+    const token = getToken()
+    if (!token) return // 🚫 don’t run before login
 
     const interval = setInterval(async () => {
       try {
         const res = await axios.get(ROUTES.ORDER.POLL_NEW, {
-          headers: { Authorization: `Bearer ${session.user.token}` }, // if API needs token
+          headers: { Authorization: `Bearer ${token}` }, // if your API needs auth
         })
         const newOrders = res.data.orders || []
 
@@ -26,34 +32,37 @@ export default function OrderNotifier() {
           if (!seenOrderIds.current.has(order.id)) {
             seenOrderIds.current.add(order.id)
 
-            toast.custom((t: Toast) => (
-              <div
-                className={`${
-                  t.visible ? "animate-enter" : "animate-leave"
-                } max-w-md w-full bg-green-50 border border-green-200 shadow-lg rounded-xl pointer-events-auto flex items-center justify-between p-4`}
-              >
-                <div className="flex items-center space-x-3">
-                  <span className="text-2xl">🍽️</span>
-                  <div>
-                    <p className="font-semibold text-green-900">
-                      🆕 New Order #{order.id}
-                    </p>
-                    <p className="text-green-800 text-sm">
-                      Table {order.table_number}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => toast.dismiss(t.id)}
-                  className="text-green-900 hover:text-green-600"
+            toast.custom(
+              (t: Toast) => (
+                <div
+                  className={`${
+                    t.visible ? "animate-enter" : "animate-leave"
+                  } max-w-md w-full bg-green-50 border border-green-200 shadow-lg rounded-xl pointer-events-auto flex items-center justify-between p-4`}
                 >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-            ), {
-              duration: Infinity,
-              position: "top-left",
-            })
+                  <div className="flex items-center space-x-3">
+                    <span className="text-2xl">🍽️</span>
+                    <div>
+                      <p className="font-semibold text-green-900">
+                        🆕 New Order #{order.id}
+                      </p>
+                      <p className="text-green-800 text-sm">
+                        Table {order.table_number}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="text-green-900 hover:text-green-600"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+              ),
+              {
+                duration: Infinity,
+                position: "top-left",
+              }
+            )
           }
         }
       } catch (err) {
@@ -62,7 +71,7 @@ export default function OrderNotifier() {
     }, 10000)
 
     return () => clearInterval(interval)
-  }, [session, status])
+  }, [])
 
   return null
 }
