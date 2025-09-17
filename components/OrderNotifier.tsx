@@ -5,21 +5,27 @@ import axios from "axios"
 import toast, { Toast } from "react-hot-toast"
 import { ROUTES } from "../lib/routes"
 import { X } from "lucide-react"
+import { useSession } from "next-auth/react"  // 👈 if using next-auth
 
 export default function OrderNotifier() {
+  const { data: session, status } = useSession()
   const seenOrderIds = useRef<Set<number>>(new Set())
 
   useEffect(() => {
+    // 👇 only run if logged in and role is admin
+    if (status !== "authenticated" || session?.user?.role !== "admin") return
+
     const interval = setInterval(async () => {
       try {
-        const res = await axios.get(ROUTES.ORDER.POLL_NEW)
+        const res = await axios.get(ROUTES.ORDER.POLL_NEW, {
+          headers: { Authorization: `Bearer ${session.user.token}` }, // if API needs token
+        })
         const newOrders = res.data.orders || []
 
         for (const order of newOrders) {
           if (!seenOrderIds.current.has(order.id)) {
             seenOrderIds.current.add(order.id)
 
-            // 👇 Use toast.custom for close button
             toast.custom((t: Toast) => (
               <div
                 className={`${
@@ -45,7 +51,7 @@ export default function OrderNotifier() {
                 </button>
               </div>
             ), {
-              duration: Infinity, // stays until ❌ clicked
+              duration: Infinity,
               position: "top-left",
             })
           }
@@ -56,7 +62,7 @@ export default function OrderNotifier() {
     }, 10000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [session, status])
 
   return null
 }
