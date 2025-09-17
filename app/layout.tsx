@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 import { Toaster } from "react-hot-toast"
 import TokenRestore from "../components/TokenRestore"
-
+import OrderNotifier from "../components/OrderNotifier"
 export const metadata: Metadata = {
   title: "JiffyMenu - Quick Food Ordering",
   description:
@@ -73,14 +73,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+     <body>
         <TokenRestore />
-        <Toaster
-          position="top-left"
-          toastOptions={{
-            duration: 3000, // default auto-dismiss
-          }}
-        />
+        <Toaster position="top-left" toastOptions={{ duration: 3000 }} />
+        <OrderNotifier /> {/* 👈 This runs globally */}
         {children}
       </body>
     </html>
