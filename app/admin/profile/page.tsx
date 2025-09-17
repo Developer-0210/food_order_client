@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Layout from "../../../components/Layout"
 import { auth, type User } from "../../../lib/auth"
@@ -14,13 +14,91 @@ import {
   ClipboardList,
   History,
   UserIcon,
+  X,
 } from "lucide-react"
 import Link from "next/link"
+import axios from "axios"
+import toast from "react-hot-toast"
+import { ROUTES } from "../../../lib/routes"
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null)
   const router = useRouter()
+  const seenOrderIds = useRef<Set<number>>(new Set())
 
+  // 🔔 Function to play notification sound
+  const playNotificationSound = () => {
+    try {
+      const audio = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.wav")
+      audio.volume = 0.7
+      audio.play().catch(() => {
+        const fallbackAudio = new Audio(
+          "https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-one/zapsplat_multimedia_notification_bell_ping_001_44712.mp3"
+        )
+        fallbackAudio.volume = 0.7
+        fallbackAudio.play().catch(() => {
+          const beepAudio = new Audio(
+            "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/Eeyw"
+          )
+          beepAudio.volume = 0.5
+          beepAudio.play().catch(() => console.log("All audio playback failed"))
+        })
+      })
+    } catch (error) {
+      console.log("Audio init failed:", error)
+    }
+  }
+
+  // 🔄 Polling for new orders & showing toast
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const res = await axios.get(ROUTES.ORDER.POLL_NEW)
+        const newOrders = res.data.orders || []
+        for (const order of newOrders) {
+          if (!seenOrderIds.current.has(order.id)) {
+            seenOrderIds.current.add(order.id)
+
+            // Play sound
+            playNotificationSound()
+
+            // Show toast
+            toast.custom(
+              (t) => (
+                <div
+                  className={`flex items-center justify-between gap-3 border border-green-500 bg-green-50 text-green-900 rounded-xl shadow-lg px-4 py-3 w-full max-w-sm ${
+                    t.visible ? "animate-enter" : "animate-leave"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span role="img" aria-label="plate">
+                      🍽️
+                    </span>
+                    <span className="font-semibold">
+                      🆕 New Order #{order.id} • Table {order.table_number}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ),
+              { duration: Infinity, position: "top-left" }
+            )
+          }
+        }
+      } catch (err) {
+        console.error("Polling error:", err)
+      }
+    }, 10000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // 🔑 Authentication check
   useEffect(() => {
     const currentUser = auth.getCurrentUser()
     if (!currentUser) {
@@ -102,7 +180,7 @@ export default function ProfilePage() {
               </Badge>
             </div>
           </div>
-  
+
           {/* Navigation Guide */}
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm flex-1 flex flex-col">
             <CardHeader className="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-t-lg">
@@ -115,7 +193,7 @@ export default function ProfilePage() {
               <p className="text-gray-600 mb-3 text-center text-sm">
                 Explore all the features available in your restaurant management dashboard
               </p>
-  
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
                 {navigationItems.map((item, index) => (
                   <Link
@@ -137,7 +215,7 @@ export default function ProfilePage() {
                   </Link>
                 ))}
               </div>
-  
+
               <div className="mt-3 p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
                 <p className="text-xs text-gray-700 text-center">
                   💡 <strong>Pro Tip:</strong> Use the sidebar navigation to quickly access any of these features.
@@ -149,4 +227,4 @@ export default function ProfilePage() {
       </div>
     </Layout>
   )
-}  
+}
