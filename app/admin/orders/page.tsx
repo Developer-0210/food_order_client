@@ -104,23 +104,26 @@ export default function OrderManagement() {
             playNotificationSound()
 
             // 👇 stays until clicked
-            toast.success(`🆕 New Order #${order.id} • Table ${order.table_number}`, {
-              duration: Infinity,
-              position: "top-left",
-              icon: "🍽️",
-              style: {
-                fontSize: "1.1rem",
-                fontWeight: "600",
-                padding: "16px 24px",
-                border: "1px solid #22c55e",
-                backgroundColor: "#f0fdf4",
-                color: "#14532d",
-                borderRadius: "12px",
-                boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
-                cursor: "pointer",
-              },
-              onClick: (t) => toast.dismiss(t.id),
-            })
+          toast.success(`🆕 New Order #${order.id} • Table ${order.table_number}`, {
+  duration: Infinity, // stays forever
+  position: "top-left",
+  icon: "🍽️",
+  style: {
+    fontSize: "1.1rem",
+    fontWeight: "600",
+    padding: "16px 24px",
+    border: "1px solid #22c55e",
+    backgroundColor: "#f0fdf4",
+    color: "#14532d",
+    borderRadius: "12px",
+    boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
+    cursor: "pointer",
+  },
+  // 👇 IMPORTANT: make it clickable + dismiss
+  role: "button",
+  onClick: (t) => toast.dismiss(t.id),
+})
+
 
             fetchOrders()
           }
