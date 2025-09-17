@@ -6,7 +6,7 @@ import Layout from "../../../components/Layout"
 import { ROUTES } from "../../../lib/routes"
 import type { Order } from "../../../types"
 import { CheckCircle, Trash2 } from "lucide-react"
-import toast from "react-hot-toast"
+import { showToast } from "../../layout"   // 👈 import global helper
 
 interface TableRequest {
   id: number
@@ -55,7 +55,7 @@ export default function OrderManagement() {
       activeOrders.forEach((order: Order) => seenOrderIds.current.add(order.id))
     } catch (err) {
       console.error("Failed to fetch orders:", err)
-      toast.error("Failed to fetch orders")
+      showToast("Failed to fetch orders", "error")
     }
   }
 
@@ -66,7 +66,7 @@ export default function OrderManagement() {
       setRequests(reqs)
     } catch (err) {
       console.error("Failed to fetch table requests:", err)
-      toast.error("Failed to fetch table requests")
+      showToast("Failed to fetch table requests", "error")
     }
   }
 
@@ -74,10 +74,10 @@ export default function OrderManagement() {
     try {
       await axios.delete(ROUTES.ORDER.TABLE_REQUEST_DELETE(requestId))
       setRequests((prev) => prev.filter((req) => req.id !== requestId))
-      toast.success("Call request Accepted")
+      showToast("Call request Accepted", "success")
     } catch (err) {
       console.error("Failed to delete request:", err)
-      toast.error("Failed to Accept call request")
+      showToast("Failed to Accept call request", "error")
     }
   }
 
@@ -103,27 +103,8 @@ export default function OrderManagement() {
             // Play sound when new order arrives
             playNotificationSound()
 
-            // 👇 stays until clicked
-          toast.success(`🆕 New Order #${order.id} • Table ${order.table_number}`, {
-  duration: Infinity, // stays forever
-  position: "top-left",
-  icon: "🍽️",
-  style: {
-    fontSize: "1.1rem",
-    fontWeight: "600",
-    padding: "16px 24px",
-    border: "1px solid #22c55e",
-    backgroundColor: "#f0fdf4",
-    color: "#14532d",
-    borderRadius: "12px",
-    boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
-    cursor: "pointer",
-  },
-  // 👇 IMPORTANT: make it clickable + dismiss
-  role: "button",
-  onClick: (t) => toast.dismiss(t.id),
-})
-
+            // Show new order toast with ❌
+            showToast(`🆕 New Order #${order.id} • Table ${order.table_number}`, "success")
 
             fetchOrders()
           }
@@ -153,10 +134,10 @@ export default function OrderManagement() {
       } else {
         fetchOrders()
       }
-      toast.success(`Order #${orderId} marked as ${status}`)
+      showToast(`Order #${orderId} marked as ${status}`, "success")
     } catch (err) {
       console.error("Failed to update order status:", err)
-      toast.error("Failed to update order status")
+      showToast("Failed to update order status", "error")
     } finally {
       setLoading(false)
     }
@@ -168,10 +149,10 @@ export default function OrderManagement() {
     try {
       await axios.delete(ROUTES.ORDER.DELETE(orderId))
       fetchOrders()
-      toast.success(`Order #${orderId} deleted`)
+      showToast(`Order #${orderId} deleted`, "success")
     } catch (err) {
       console.error("Failed to delete order:", err)
-      toast.error("Failed to delete order")
+      showToast("Failed to delete order", "error")
     } finally {
       setLoading(false)
     }
