@@ -6,7 +6,7 @@ import Layout from "../../../components/Layout"
 import { ROUTES } from "../../../lib/routes"
 import type { Order } from "../../../types"
 import { CheckCircle, Trash2 } from "lucide-react"
-import { showToast } from "../../../lib/toast"
+import toast from "react-hot-toast"
 
 interface TableRequest {
   id: number
@@ -25,15 +25,17 @@ export default function OrderManagement() {
   const playNotificationSound = () => {
     try {
       const audio = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.wav")
-      audio.volume = 0.7
+      audio.volume = 0.7 // Set volume to 70%
       audio.play().catch((error) => {
         console.log("Primary audio failed, trying fallback:", error)
+        // Fallback sound
         const fallbackAudio = new Audio(
           "https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-one/zapsplat_multimedia_notification_bell_ping_001_44712.mp3",
         )
         fallbackAudio.volume = 0.7
         fallbackAudio.play().catch((err) => {
           console.log("Fallback audio also failed:", err)
+          // Second fallback - simple beep sound
           const beepAudio = new Audio(
             "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/Eeyw",
           )
@@ -55,7 +57,7 @@ export default function OrderManagement() {
       activeOrders.forEach((order: Order) => seenOrderIds.current.add(order.id))
     } catch (err) {
       console.error("Failed to fetch orders:", err)
-      showToast("Failed to fetch orders", "error")
+      toast.error("Failed to fetch orders")
     }
   }
 
@@ -66,7 +68,7 @@ export default function OrderManagement() {
       setRequests(reqs)
     } catch (err) {
       console.error("Failed to fetch table requests:", err)
-      showToast("Failed to fetch table requests", "error")
+      toast.error("Failed to fetch table requests")
     }
   }
 
@@ -74,10 +76,10 @@ export default function OrderManagement() {
     try {
       await axios.delete(ROUTES.ORDER.TABLE_REQUEST_DELETE(requestId))
       setRequests((prev) => prev.filter((req) => req.id !== requestId))
-      showToast("Call request Accepted", "success")
+      toast.success("Call request Accepted")
     } catch (err) {
       console.error("Failed to delete request:", err)
-      showToast("Failed to Accept call request", "error")
+      toast.error("Failed to Accept call request")
     }
   }
 
@@ -103,9 +105,21 @@ export default function OrderManagement() {
             // Play sound when new order arrives
             playNotificationSound()
 
-            // Show new order toast with ❌
-            showToast(`🆕 New Order #${order.id} • Table ${order.table_number}`, "success")
-
+            toast.success(`🆕 New Order #${order.id} • Table ${order.table_number}`, {
+              duration: 10000,
+              position: "top-left",
+              icon: "🍽️",
+              style: {
+                fontSize: "1.1rem",
+                fontWeight: "600",
+                padding: "16px 24px",
+                border: "1px solid #22c55e",
+                backgroundColor: "#f0fdf4",
+                color: "#14532d",
+                borderRadius: "12px",
+                boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
+              },
+            })
             fetchOrders()
           }
         }
@@ -134,10 +148,10 @@ export default function OrderManagement() {
       } else {
         fetchOrders()
       }
-      showToast(`Order #${orderId} marked as ${status}`, "success")
+      toast.success(`Order #${orderId} marked as ${status}`)
     } catch (err) {
       console.error("Failed to update order status:", err)
-      showToast("Failed to update order status", "error")
+      toast.error("Failed to update order status")
     } finally {
       setLoading(false)
     }
@@ -149,10 +163,10 @@ export default function OrderManagement() {
     try {
       await axios.delete(ROUTES.ORDER.DELETE(orderId))
       fetchOrders()
-      showToast(`Order #${orderId} deleted`, "success")
+      toast.success(`Order #${orderId} deleted`)
     } catch (err) {
       console.error("Failed to delete order:", err)
-      showToast("Failed to delete order", "error")
+      toast.error("Failed to delete order")
     } finally {
       setLoading(false)
     }
@@ -291,4 +305,4 @@ export default function OrderManagement() {
       </div>
     </Layout>
   )
-}
+} 
