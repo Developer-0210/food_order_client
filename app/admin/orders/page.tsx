@@ -25,17 +25,15 @@ export default function OrderManagement() {
   const playNotificationSound = () => {
     try {
       const audio = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.wav")
-      audio.volume = 0.7 // Set volume to 70%
+      audio.volume = 0.7
       audio.play().catch((error) => {
         console.log("Primary audio failed, trying fallback:", error)
-        // Fallback sound
         const fallbackAudio = new Audio(
           "https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-one/zapsplat_multimedia_notification_bell_ping_001_44712.mp3",
         )
         fallbackAudio.volume = 0.7
         fallbackAudio.play().catch((err) => {
           console.log("Fallback audio also failed:", err)
-          // Second fallback - simple beep sound
           const beepAudio = new Audio(
             "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/Eeyw",
           )
@@ -105,23 +103,24 @@ export default function OrderManagement() {
             // Play sound when new order arrives
             playNotificationSound()
 
-           toast.success(`🆕 New Order #${order.id} • Table ${order.table_number}`, {
-  duration: Infinity, // 👈 never auto-dismiss
-  position: "top-left",
-  icon: "🍽️",
-  style: {
-    fontSize: "1.1rem",
-    fontWeight: "600",
-    padding: "16px 24px",
-    border: "1px solid #22c55e",
-    backgroundColor: "#f0fdf4",
-    color: "#14532d",
-    borderRadius: "12px",
-    boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
-    cursor: "pointer", // 👈 makes it clear you can click
-  },
-  onClick: (t) => toast.dismiss(t.id), // 👈 dismiss when clicked
-})
+            // 👇 stays until clicked
+            toast.success(`🆕 New Order #${order.id} • Table ${order.table_number}`, {
+              duration: Infinity,
+              position: "top-left",
+              icon: "🍽️",
+              style: {
+                fontSize: "1.1rem",
+                fontWeight: "600",
+                padding: "16px 24px",
+                border: "1px solid #22c55e",
+                backgroundColor: "#f0fdf4",
+                color: "#14532d",
+                borderRadius: "12px",
+                boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
+                cursor: "pointer",
+              },
+              onClick: (t) => toast.dismiss(t.id),
+            })
 
             fetchOrders()
           }
