@@ -1,10 +1,7 @@
-"use client"
-
 import type { Metadata } from "next"
 import "./globals.css"
-import { Toaster, toast } from "react-hot-toast"
+import { Toaster } from "react-hot-toast"
 import TokenRestore from "../components/TokenRestore"
-import { X } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "JiffyMenu - Quick Food Ordering",
@@ -76,7 +73,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body> <TokenRestore /> {/* 👈 Add this here */} <Toaster position="top-left" toastOptions={{ duration: 3000 }} /> {children} </body>
+      <body>
+        <TokenRestore />
+        <Toaster
+          position="top-left"
+          toastOptions={{
+            duration: 3000, // default auto-dismiss
+          }}
+        />
+        {children}
+      </body>
     </html>
   )
 }
