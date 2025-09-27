@@ -95,11 +95,16 @@ export default function LoginPage() {
               </div>
             </div>
             <CardTitle className="text-3xl font-bold text-white mb-2">
-              Welcome Back
+              Welcome to JiffyMenu
             </CardTitle>
             <p className="text-slate-400 text-base leading-relaxed">
-              Sign in to your restaurant dashboard and manage your business.
-            </p>
+  <a
+    href="https://your-app-link.com/app.apk" 
+    className="text-green-600 hover:underline"
+  >
+    Download Android Application
+  </a>
+</p>
           </CardHeader>
 
           <CardContent className="px-8 pb-8">
