@@ -99,7 +99,7 @@ export default function LoginPage() {
             </CardTitle>
             <p className="text-slate-400 text-base leading-relaxed">
   <a
-    href="https://your-app-link.com/app.apk" 
+    href="https://median.co/share/rdeqabj#apk" 
     className="text-green-600 hover:underline"
   >
     Download Android Application
