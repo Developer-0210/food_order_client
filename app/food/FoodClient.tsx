@@ -254,7 +254,8 @@ export default function FoodMenuPage() {
         </section>
 
         {/* Cart */}
-        <aside className="space-y-4">
+       <aside className="space-y-4 sticky top-4 self-start h-fit">
+
           <h2 className="text-lg font-semibold flex items-center">
             <ShoppingCart className="h-5 w-5 mr-1" /> Cart
           </h2>
