@@ -23,6 +23,7 @@ export default function FoodMenuPage() {
   const [cart, setCart] = useState<CartLine[]>([])
   const [placing, setPlacing] = useState(false)
   const [msg, setMsg] = useState("")
+  const [notification, setNotification] = useState("") // ✅ notification toast
   const [selectedCategory, setSelectedCategory] = useState<FoodCategory>("all")
   const [quantitySelections, setQuantitySelections] = useState<Record<number, string>>({})
   const [quantities, setQuantities] = useState<Record<number, number>>({})
@@ -121,9 +122,13 @@ export default function FoodMenuPage() {
         })),
       })
 
-      setMsg("✅ Order placed! Your food will be prepared shortly and billing will be at counter")
+      setMsg("✅ Order placed! Your food will be prepared shortly.")
       setCart([])
       setShowCart(false)
+
+      // ✅ Toast notification
+      setNotification("✅ Your order has been placed successfully!")
+      setTimeout(() => setNotification(""), 3000)
     } catch (e: any) {
       console.error("Order placement error:", e.response)
       setMsg(e.response?.data?.detail || "Failed to place order.")
@@ -148,7 +153,14 @@ export default function FoodMenuPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-100 relative">
-      {/* Top Header */}
+      {/* ✅ Notification Toast */}
+      {notification && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in">
+          {notification}
+        </div>
+      )}
+
+      {/* Header */}
       <header className="bg-white shadow sticky top-0 z-10">
         <div className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -189,7 +201,7 @@ export default function FoodMenuPage() {
         </div>
       </header>
 
-      {/* Menu */}
+      {/* Menu Section */}
       <main className="mx-auto max-w-7xl px-4 py-6">
         {Object.entries(filteredMenu).map(([category, items]) => (
           <div key={category} className="mb-8">
