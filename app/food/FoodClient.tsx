@@ -66,8 +66,6 @@ export default function FoodMenuPage() {
       alert("❌ Failed to call waiter")
     }
   }
-  
-
 
   const addToCart = (item: MenuItem) => {
     const selectedType = quantitySelections[item.id] || item.quantity_prices?.[0]?.quantity_type
@@ -148,34 +146,34 @@ export default function FoodMenuPage() {
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-100">
       <header className="bg-white shadow sticky top-0 z-10">
         <div className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-  <div className="flex items-center gap-2">
-    <Filter className="w-4 h-4 text-gray-500" />
-    <select
-      value={selectedCategory}
-      onChange={(e) => setSelectedCategory(e.target.value)}
-      className="border rounded-md px-2 py-1 text-sm focus:outline-none"
-    >
-      {categories.map((cat) => (
-        <option key={cat} value={cat}>
-          {cat === "all" ? "All Categories" : cat.charAt(0).toUpperCase() + cat.slice(1)}
-        </option>
-      ))}
-    </select>
-  </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-gray-500" />
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="border rounded-md px-2 py-1 text-sm focus:outline-none"
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat === "all" ? "All Categories" : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-  <button
-    onClick={callWaiter}
-    className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm font-medium"
-  >
-    📞 Call Waiter
-  </button>
-</div>
-
+            <button
+              onClick={callWaiter}
+              className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm font-medium"
+            >
+              📞 Call Waiter
+            </button>
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-6 grid gap-8 lg:grid-cols-3">
+      {/* main layout */}
+      <main className="mx-auto max-w-7xl px-4 py-6 grid gap-8 lg:grid-cols-3 items-start">
         {/* Menu */}
         <section className="lg:col-span-2 space-y-8">
           {Object.entries(filteredMenu).map(([category, items]) => (
@@ -254,8 +252,7 @@ export default function FoodMenuPage() {
         </section>
 
         {/* Cart */}
-       <aside className="space-y-4 sticky top-4 self-start h-fit">
-
+        <aside className="space-y-4 sticky top-20 self-start h-fit">
           <h2 className="text-lg font-semibold flex items-center">
             <ShoppingCart className="h-5 w-5 mr-1" /> Cart
           </h2>
