@@ -66,6 +66,8 @@ export default function FoodMenuPage() {
       alert("❌ Failed to call waiter")
     }
   }
+  
+
 
   const addToCart = (item: MenuItem) => {
     const selectedType = quantitySelections[item.id] || item.quantity_prices?.[0]?.quantity_type
@@ -146,35 +148,35 @@ export default function FoodMenuPage() {
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-100">
       <header className="bg-white shadow sticky top-0 z-10">
         <div className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-gray-500" />
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="border rounded-md px-2 py-1 text-sm focus:outline-none"
-              >
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat === "all" ? "All Categories" : cat.charAt(0).toUpperCase() + cat.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
+        <div className="flex items-center gap-4">
+  <div className="flex items-center gap-2">
+    <Filter className="w-4 h-4 text-gray-500" />
+    <select
+      value={selectedCategory}
+      onChange={(e) => setSelectedCategory(e.target.value)}
+      className="border rounded-md px-2 py-1 text-sm focus:outline-none"
+    >
+      {categories.map((cat) => (
+        <option key={cat} value={cat}>
+          {cat === "all" ? "All Categories" : cat.charAt(0).toUpperCase() + cat.slice(1)}
+        </option>
+      ))}
+    </select>
+  </div>
 
-            <button
-              onClick={callWaiter}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm font-medium"
-            >
-              📞 Call Waiter
-            </button>
-          </div>
+  <button
+    onClick={callWaiter}
+    className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm font-medium"
+  >
+    📞 Call Waiter
+  </button>
+</div>
+
         </div>
       </header>
 
-      {/* Layout */}
-      <main className="mx-auto max-w-7xl px-4 py-6 grid gap-8 lg:grid-cols-3 items-start">
-        {/* Menu Section */}
+      <main className="mx-auto max-w-7xl px-4 py-6 grid gap-8 lg:grid-cols-3">
+        {/* Menu */}
         <section className="lg:col-span-2 space-y-8">
           {Object.entries(filteredMenu).map(([category, items]) => (
             <div key={category}>
@@ -251,73 +253,66 @@ export default function FoodMenuPage() {
           ))}
         </section>
 
-        {/* Cart (Fixed on mobile, Sticky on desktop) */}
-        <aside
-          className="
-            space-y-4
-            lg:sticky lg:top-20 lg:self-start lg:h-fit
-            fixed bottom-0 left-0 right-0 z-50
-            bg-white border-t shadow-inner
-            p-4
-            lg:p-0
-          "
-        >
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-lg font-semibold flex items-center lg:mb-2">
-              <ShoppingCart className="h-5 w-5 mr-1" /> Cart
-            </h2>
+        {/* Cart */}
+       <aside className="space-y-4 sticky top-4 self-start h-fit">
 
-            <div className="bg-white rounded-lg shadow divide-y max-h-[60vh] overflow-y-auto lg:max-h-none">
-              {cart.length === 0 && (
-                <p className="p-4 text-sm text-gray-500">No items added yet.</p>
-              )}
-              {cart.map((l) => {
-                const linePrice = getPriceForType(l.item, l.selected_type) * l.qty
-                return (
-                  <div
-                    key={`${l.item.id}-${l.selected_type}`}
-                    className="p-4 flex items-center justify-between text-sm"
-                  >
-                    <div>
-                      {l.qty}× {l.item.name}
-                      <span className="block text-xs text-gray-500 capitalize">
-                        {l.selected_type}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="font-semibold">₹{linePrice.toFixed(2)}</span>
-                      <button
-                        onClick={() => changeQty(l.item.id, l.selected_type, -1)}
-                        className="p-1 bg-gray-200 rounded hover:bg-gray-300"
-                      >
-                        <Minus className="h-3 w-3" />
-                      </button>
-                      <button
-                        onClick={() => changeQty(l.item.id, l.selected_type, +1)}
-                        className="p-1 bg-gray-200 rounded hover:bg-gray-300"
-                      >
-                        <Plus className="h-3 w-3" />
-                      </button>
-                    </div>
+          <h2 className="text-lg font-semibold flex items-center">
+            <ShoppingCart className="h-5 w-5 mr-1" /> Cart
+          </h2>
+
+          <div className="bg-white rounded-lg shadow divide-y">
+            {cart.length === 0 && (
+              <p className="p-4 text-sm text-gray-500">No items added yet.</p>
+            )}
+            {cart.map((l) => {
+              const linePrice = getPriceForType(l.item, l.selected_type) * l.qty
+              return (
+                <div
+                  key={`${l.item.id}-${l.selected_type}`}
+                  className="p-4 flex items-center justify-between text-sm"
+                >
+                  <div>
+                    {l.qty}× {l.item.name}
+                    <span className="block text-xs text-gray-500 capitalize">
+                      {l.selected_type}
+                    </span>
                   </div>
-                )
-              })}
-            </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-semibold">₹{linePrice.toFixed(2)}</span>
+                    <button
+                      onClick={() => changeQty(l.item.id, l.selected_type, -1)}
+                      className="p-1 bg-gray-200 rounded hover:bg-gray-300"
+                    >
+                      <Minus className="h-3 w-3" />
+                    </button>
+                    <button
+                      onClick={() => changeQty(l.item.id, l.selected_type, +1)}
+                      className="p-1 bg-gray-200 rounded hover:bg-gray-300"
+                    >
+                      <Plus className="h-3 w-3" />
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
 
-            <div className="space-y-2 mt-2">
-              <div className="text-right font-semibold">Total: ₹{total.toFixed(2)}</div>
-              <button
-                disabled={placing || !tableId || cart.length === 0}
-                onClick={placeOrder}
-                className="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded disabled:opacity-50 hover:bg-blue-700"
-              >
-                {placing ? "Placing…" : "Place Order"}
-              </button>
-              {msg && <div className="text-sm text-center text-green-700">{msg}</div>}
-            </div>
+          <div className="space-y-2">
+            <div className="text-right font-semibold">Total: ₹{total.toFixed(2)}</div>
+            <button
+              disabled={placing || !tableId || cart.length === 0}
+              onClick={placeOrder}
+              className="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded disabled:opacity-50 hover:bg-blue-700"
+            >
+              {placing ? "Placing…" : "Place Order"}
+            </button>
+            {msg && <div className="text-sm text-center text-green-700">{msg}</div>}
           </div>
         </aside>
       </main>
     </div>
   )
 }
+
+
+
